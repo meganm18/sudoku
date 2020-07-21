@@ -81,15 +81,6 @@ class _MyHomePageState extends State<MyHomePage> {
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
         child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Invoke "debug painting" (press "p" in the console, choose the
-          // "Toggle Debug Paint" action from the Flutter Inspector in Android
-          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
-          // to see the wireframe for each widget.
-          //
           // Column has various properties to control how it sizes itself and
           // how it positions its children. Here we use mainAxisAlignment to
           // center the children vertically; the main axis here is the vertical
@@ -105,6 +96,8 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            _buildSquare("9"),
+            _buildBox(9),
           ],
         ),
       ),
@@ -115,4 +108,56 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
+  Widget _buildSquare(String Num) => Container(
+    decoration: BoxDecoration(
+      border: Border.all(width: 10, color: Colors.black26),
+      ),
+    child: 
+      Container(
+          child: Text(Num)
+      )
+  );
+
+  Widget _buildBox(int ct) => Flexible(
+    child: Container(
+      decoration: BoxDecoration(
+      border: Border.all(width: 10, color: Colors.black)
+    ),
+      child: GridView.count(
+        crossAxisCount: 3,
+        children:
+          _buildSquareList(9)
+      )
+  ));
+
+  List<Container> _buildSquareList(int ct) => List.generate(
+    9, (i) => Container(child: _buildSquare((i+1).toString())));
+
+  Widget _buildGrid() => GridView.count(
+   /* decoration: BoxDecoration(
+      border: Border.all(width: 10, color: Colors.black38)
+    )*/
+   crossAxisCount: 3,
+   mainAxisSpacing: 3.0,
+   crossAxisSpacing: 3.0,
+   children: _buildBoxList());
+
+
+  List<Container> _buildBoxList() => List.generate(
+    9, (i) => Container(child: _buildBox(i)));
+
+
+  /*Widget _buildBox() => Container(
+    decoration: BoxDecoration(
+      border: Border.all(width: 10, color: Colors.black38),
+    ),
+    child: Column(
+      children: [
+        _buildRow(),
+        _buildRow(),
+        _buildRow(),
+      ]
+    )
+  );*/
 }
