@@ -73,22 +73,12 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-
             Text(
               'You have pushed the button this many times:',
             ),
@@ -96,10 +86,8 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
-            //_buildSquare("9"),
-            //_buildBox(9),
             Expanded(
-            child: _buildGrid(),
+              child: _buildGrid(),
             ),
           ],
         ),
@@ -113,48 +101,40 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildSquare(String Num) => Container(
-    decoration: BoxDecoration(
-      border: Border.all(width: 5, color: Colors.black26),
-    ),
-    alignment: Alignment(0, 0),
-    child: 
-      Container(
-          child: Text(Num)
-      )
-  );
-
-  Widget _buildBox(int ct) => Row(
-    children: [
-  Flexible(
-    child: Container(
       decoration: BoxDecoration(
-      border: Border.all(width: 5, color: Colors.black)
-    ),
-      child: GridView.count(
-        crossAxisCount: 3,
-        children:
-          _buildSquareList(9)
-      )
-  ))]);
+        border: Border.all(width: 5, color: Colors.black26),
+      ),
+      alignment: Alignment(0, 0),
+      child: Container(
+          child:
+          TextField(
+             decoration: InputDecoration(
+               hintText: Num
+             )
+          )
+      ));
+
+  Widget _buildBox(int ct) => Row(children: [
+        Flexible(
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 5, color: Colors.black)),
+                child: GridView.count(
+                    crossAxisCount: 3, children: _buildSquareList(9))))
+      ]);
 
   List<Container> _buildSquareList(int ct) => List.generate(
-    9, (i) => Container(child: _buildSquare((i+1).toString())));
+      9, (i) => Container(child: _buildSquare((i + 1).toString())));
 
-  Widget _buildGrid() => Row(
-      children: [ Flexible(
-      child: Container(
-          decoration: BoxDecoration(
-              border: Border.all(width: 5, color: Colors.black)
-          ),
-          child: GridView.count(
-              crossAxisCount: 3,
-              children:
-              _buildBoxList()
-          )
-      ))]);
+  Widget _buildGrid() => Row(children: [
+        Flexible(
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 5, color: Colors.black)),
+                child: GridView.count(
+                    crossAxisCount: 3, children: _buildBoxList())))
+      ]);
 
-  List<Container> _buildBoxList() => List.generate(
-    9, (i) => Container(child: _buildBox(i)));
-
-
+  List<Container> _buildBoxList() =>
+      List.generate(9, (i) => Container(child: _buildBox(i)));
 }
