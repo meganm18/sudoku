@@ -96,8 +96,11 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
-            _buildSquare("9"),
-            _buildBox(9),
+            //_buildSquare("9"),
+            //_buildBox(9),
+            Expanded(
+            child: _buildGrid(),
+            ),
           ],
         ),
       ),
@@ -111,53 +114,47 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildSquare(String Num) => Container(
     decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black26),
-      ),
+      border: Border.all(width: 5, color: Colors.black26),
+    ),
+    alignment: Alignment(0, 0),
     child: 
       Container(
           child: Text(Num)
       )
   );
 
-  Widget _buildBox(int ct) => Flexible(
+  Widget _buildBox(int ct) => Row(
+    children: [
+  Flexible(
     child: Container(
       decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black)
+      border: Border.all(width: 5, color: Colors.black)
     ),
       child: GridView.count(
         crossAxisCount: 3,
         children:
           _buildSquareList(9)
       )
-  ));
+  ))]);
 
   List<Container> _buildSquareList(int ct) => List.generate(
     9, (i) => Container(child: _buildSquare((i+1).toString())));
 
-  Widget _buildGrid() => GridView.count(
-   /* decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black38)
-    )*/
-   crossAxisCount: 3,
-   mainAxisSpacing: 3.0,
-   crossAxisSpacing: 3.0,
-   children: _buildBoxList());
-
+  Widget _buildGrid() => Row(
+      children: [ Flexible(
+      child: Container(
+          decoration: BoxDecoration(
+              border: Border.all(width: 5, color: Colors.black)
+          ),
+          child: GridView.count(
+              crossAxisCount: 3,
+              children:
+              _buildBoxList()
+          )
+      ))]);
 
   List<Container> _buildBoxList() => List.generate(
     9, (i) => Container(child: _buildBox(i)));
 
 
-  /*Widget _buildBox() => Container(
-    decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black38),
-    ),
-    child: Column(
-      children: [
-        _buildRow(),
-        _buildRow(),
-        _buildRow(),
-      ]
-    )
-  );*/
 }
