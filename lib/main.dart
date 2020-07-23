@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'generator.dart';
+
+// import 'dart:async';
+// import 'package:path/path.dart';
+// import 'package:sqflite/sqflite.dart';
+
 void main() {
+  Generator.makeBoard();
   runApp(MyApp());
 }
 
@@ -100,7 +107,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildSquare(String Num) => Container(
+  Widget _buildSquare(String num) => Container(
       decoration: BoxDecoration(
         border: Border.all(width: 5, color: Colors.black26),
       ),
@@ -109,7 +116,7 @@ class _MyHomePageState extends State<MyHomePage> {
           child:
           TextField(
              decoration: InputDecoration(
-               hintText: Num
+               hintText: num
              )
           )
       ));
