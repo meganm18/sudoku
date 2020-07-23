@@ -99,4 +99,106 @@ class Generator {
       });
       return newKnowns;
   }
+
+  /*
+    Checks if any of these new values are duplicate values in the same
+    row, column, or block of 9 squares
+
+    @param newKnowns  List of new squares and their values
+    @return           true if duplicate, false otherwise
+   */
+  static bool isNewKnownError(List<Tuple2<int, int>> newKnowns){
+    if (newKnowns.length < 2){
+      return false;
+    }
+    // list is probably small enough that it is faster to loop through
+    // repeatedly as opposed to checking each row, col, and box of 9
+    for(var i = 0; i < (newKnowns.length - 1); i++){
+      var square = newKnowns[i].item1;
+      int row = square ~/ 10;
+      int col = square % 10;
+      // boxes are numbered starting with 0 in row-major order
+      int box = (row ~/ 3) * 3 + (col ~/ 3);
+      var value = newKnowns[i].item2;
+      for(var j = i; j < newKnowns.length; j++){
+        if(newKnowns[j].item2 == value){
+          var square2 = newKnowns[j].item1;
+          int row2 = square2 ~/ 10;
+          int col2 = square2 % 10;
+          int box2 = (row2 ~/ 3) * 3 + (col2 ~/ 3);
+          if ((row == row2) || (col == col2) || (box == box2)){
+            return true;
+          } // if duplicate values in row/col/group
+        } // if duplicate values
+      } // for j
+    } // for i
+   return false;
+  } // isNewKnownError()
+
+  /*
+    Checks if there is a duplicate in a row/column/square of 9
+    Would likely only possibly use for the starting board and
+    maybe as a last check at end?
+
+    @param board  current state of the board
+    @return       true if duplicate, false otherwise
+   */
+  static bool isError(List<List<int>> board){
+    // row
+    for (var r = 0; r < 9; r++){
+      var rowSet = HashSet<int>();
+      for (var c = 0; c < 9; c++){
+        var boardValue = board[r][c];
+        if(boardValue != null){
+          if(rowSet.contains(boardValue)){
+            return true;
+          }
+          else{
+            rowSet.add(boardValue);
+          }
+        } // if not null
+      } // for col
+    } // for row
+
+    // column
+    for (var c = 0; c < 9; c++){
+      var columnSet = HashSet<int>();
+      for (var r = 0; r < 9; r++){
+        var boardValue = board[r][c];
+        if(boardValue != null){
+          if(columnSet.contains(boardValue)){
+            return true;
+          }
+          else{
+            columnSet.add(boardValue);
+          }
+        } // if not null
+      } // for row
+    } // for col
+
+    // square of 9
+    for(var rindex = 0; rindex < 3; rindex++){
+      for(var cindex = 0; cindex < 3; cindex++){
+        var groupSet = HashSet<int>();
+        for(var r = 0; r < 3; r++){
+          for(var c = 0; c < 3; c++){
+            var row = rindex * 3 + r;
+            var column = cindex * 3 + c;
+            var boardValue = board[row][column];
+            if(boardValue != null) {
+              if (groupSet.contains(boardValue)) {
+                return true;
+              }
+              else {
+                groupSet.add(boardValue);
+              }
+            } // if not null
+          } // for c
+        } // for r
+      } // for cindex
+    } // for rindex
+
+    return false;
+  }
+
 }
