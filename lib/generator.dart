@@ -4,6 +4,7 @@ import 'package:tuple/tuple.dart';
 /*
   QUESTIONS:
   Would it be better to keep track of # of possible #s per square too?
+  Should one possible left check if 0 are possible? - Yes?
  */
 
 class Generator {
@@ -77,12 +78,25 @@ class Generator {
 
   /*
     Iterates through the unknown squares to check if there is only 1 possible left
+
     @param possible   map of possible values for each square
     @param unknowns   set of squares where the correct value is unknown
     @return           list of tuples of squares and their only possible value
    */
   static List<Tuple2<int, int>> onePossibleLeft(
       HashMap<int, HashSet<int>> possible, HashSet<int> unknowns){
-
+      List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
+      unknowns.forEach((square){
+        if(possible[square].isEmpty){
+          // not possible to solve
+          const error = const Tuple2<int, int>(99, 99);
+          return [error];
+        }
+        else if(possible[square].length == 1){
+          // must be that square's value
+          newKnowns.add(Tuple2<int, int>(square, possible[square].first));
+        }
+      });
+      return newKnowns;
   }
 }
