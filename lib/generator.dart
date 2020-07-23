@@ -43,6 +43,30 @@ class Generator {
   } // solver()
 
   /*
+    Check for errors and set the values of the new known squares
+
+    @param newKnowns  List of new known squares and their values
+    @return bool      false if problem in the board, true otherwise
+   */
+  bool setNewKnowns(List<Tuple2<int, int>> newKnowns){
+    var isError = isNewKnownError(newKnowns);
+    if(isError){
+      return false;
+    }
+    newKnowns.forEach((known) {
+      var square = known.item1;
+      int row = square ~/ 10;
+      int col = square % 10;
+      var value = known.item2;
+      this.unknowns.remove(square);
+      this.knowns.add(square);
+      this.board[row][col] = value;
+      this.possible[square] = null;
+    });
+    return true;
+  }
+
+  /*
    Update possible values of the squares in the same row, column, and block
    of the recently found square.
 
@@ -103,28 +127,109 @@ class Generator {
       return newKnowns;
   } // onePossibleLeft()
 
-  /*
-    Check for errors and set the values of the new known squares
+  List<Tuple2<int, int>> oneLeftRowColBox(){
+     List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
+     // rows
+     for(var r = 0; r < 9; r++){
+       Map<int, int> counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
+       var onlyOne = HashSet<int>();
+       for(var c = 0; c < 9; c++){
+         int key = r * 10 + c;
+         this.possible[key].forEach((possible) { 
+           counts[possible]++;
+           if (counts[possible] == 1){
+             onlyOne.add(possible);
+           }
+           else if(onlyOne.contains(possible)){
+             onlyOne.remove(possible);
+           }
+         });
+       } // for col
+       //only one square can have a certain value for this row
+       if (onlyOne.isNotEmpty){
+         for (var c = 0; c < 9; c++){
+           int key = r * 10 + c;
+           this.possible[key].forEach((possible) {
+             if (onlyOne.contains(possible)){
+               newKnowns.add(Tuple2<int, int>(key, possible));
+             }
+           });
+         } // for col
+       } // if onlyOne not empty
+     } //for row
 
-    @param newKnowns  List of new known squares and their values
-    @return bool      false if problem in the board, true otherwise
-   */
-  bool setNewKnowns(List<Tuple2<int, int>> newKnowns){
-    var isError = isNewKnownError(newKnowns);
-    if(isError){
-      return false;
-    }
-    newKnowns.forEach((known) {
-      var square = known.item1;
-      int row = square ~/ 10;
-      int col = square % 10;
-      var value = known.item2;
-      this.unknowns.remove(square);
-      this.knowns.add(square);
-      this.board[row][col] = value;
-      this.possible[square] = null;
-    });
-    return true;
+     // columns
+     for(var c = 0; c < 9; c++){
+       Map<int, int> counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
+       var onlyOne = HashSet<int>();
+       for(var r = 0; r < 9; r++){
+         int key = r * 10 + c;
+         this.possible[key].forEach((possible) {
+           counts[possible]++;
+           if (counts[possible] == 1){
+             onlyOne.add(possible);
+           }
+           else if(onlyOne.contains(possible)){
+             onlyOne.remove(possible);
+           }
+         });
+       } // for row
+       //only one square can have a certain value for this row
+       if (onlyOne.isNotEmpty){
+         for (var r = 0; r < 9; r++){
+           int key = r * 10 + c;
+           this.possible[key].forEach((possible) {
+             if (onlyOne.contains(possible)){
+               newKnowns.add(Tuple2<int, int>(key, possible));
+             }
+           });
+         } // for row
+       } // if onlyOne not empty
+     } //for column
+
+     // for box of 9
+     // boxes are numbered from 0 in row-major order
+     // first 2 for loops iterate through the rows/columns of groups of 9
+     // inner 2 for loops iterate through the rows/columns of that group of 9
+     for (var rIndex = 0; rIndex < 3; rIndex ++){
+       for (var cIndex = 0; cIndex < 3; cIndex ++) {
+         // can now identify a box of 9
+         Map<int, int> counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
+         var onlyOne = HashSet<int>();
+         for (var r = 0; r < 3; r++){
+           for (var c = 0; c < 3; c++){
+             var row = rIndex * 3 + r;
+             var col = cIndex * 3 + c;
+             var key = row * 10 + col;
+             this.possible[key].forEach((possible) {
+               counts[possible]++;
+               if (counts[possible] == 1){
+                 onlyOne.add(possible);
+               }
+               else if(onlyOne.contains(possible)){
+                 onlyOne.remove(possible);
+               }
+             });
+           } // for c
+         } // for r
+         if (onlyOne.isNotEmpty){
+           for (var r = 0; r < 3; r++){
+             for (var c = 0; c < 3; c++) {
+               var row = rIndex * 3 + r;
+               var col = cIndex * 3 + c;
+               int key = row * 10 + col;
+               this.possible[key].forEach((possible) {
+                 if (onlyOne.contains(possible)) {
+                   newKnowns.add(Tuple2<int, int>(key, possible));
+                 }
+               });
+             } // for c
+           } // for r
+         } // if onlyOne not empty
+       } // for cIndex
+     } // for rIndex
+
+     return newKnowns;
   }
 
   /*
