@@ -8,31 +8,39 @@ import 'package:tuple/tuple.dart';
  */
 
 class Generator {
+  List<List<int>> board; // need to create size
+  Set<int> unknowns;
+  Set<int> knowns;
+  HashMap<int, HashSet<int>> possible;
+
+  Generator(){
+    this.board = List<List<int>>.filled(9, List<int>.filled(9, null));
+    this.unknowns = Set<int>();
+    this.knowns = Set<int>();
+    this.possible = HashMap<int, HashSet<int>>();
+  }
+
   static void makeBoard() {
     print("hi");
   }
 
-  static List<List<int>> solver(List<List<int>> input) {
+  List<List<int>> solver() {
     // map key will be 2 digit #: first represents cell's row index, second is col index
-    HashMap possible = new HashMap<int, HashSet<int>>();
-    var unknown = Set();
-    var known = Set();
-    // initialize possible #'s to be 1-9 ( can we do this above?)
     for (var i = 0; i < 9; i++) {
       for (var j = 0; j < 9; j++) {
         var key = i * 10 + j;
-        if (input[i][j].isNaN) {
+        if (this.board[i][j].isNaN) {
           var value = HashSet<int>.from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
-          possible[key] = value;
-          unknown.add(key);
+          this.possible[key] = value;
+          this.unknowns.add(key);
         } // if not NA
         else {
-          known.add(key);
+          this.knowns.add(key);
         } // else is NA
       } // for j
     } // for i
-    return input; // will update but was error when included????
-  } // solver
+    return this.board; // will update but was error when included????
+  } // solver()
 
   /*
    Update possible values of the squares in the same row, column, and block
@@ -41,21 +49,19 @@ class Generator {
    @param possible  map of possible values for all of the squares
    @param key       key of the recently found square (row*10 + column)
    @param value     known value of the recently found square
-   @return          updated map of possible values
    */
-  static HashMap<int, HashSet<int>> updatePossible(
-      HashMap<int, HashSet<int>> possible, int key, int value) {
+   void updatePossible(int key, int value) {
       int rowNum = key ~/ 10;
       int colNum = key % 10;
       // update row and column
       for (var i = 0; i < 9; i++){
         var rowKey = rowNum * 10 + i;
         var colKey = i * 10 + colNum;
-        if (possible[rowKey] != null) {
-          possible[rowKey].remove(value);
+        if (this.possible[rowKey] != null) {
+          this.possible[rowKey].remove(value);
         }
-        if (possible[colKey] != null){
-          possible[colKey].remove(value);
+        if (this.possible[colKey] != null){
+          this.possible[colKey].remove(value);
         }
       }
       // update block of 9
@@ -67,14 +73,12 @@ class Generator {
       for (var r = firstRow; r <= firstRow + 2; r++) {
         for (var c = firstCol; c <= firstCol + 2; c++) {
           var blockKey = r * 10 + c;
-          if (possible[blockKey] != null){
-            possible[blockKey].remove(value);
+          if (this.possible[blockKey] != null){
+            this.possible[blockKey].remove(value);
           }
         }
       }
-
-      return possible;
-  }
+  } // updatePossible()
 
   /*
     Iterates through the unknown squares to check if there is only 1 possible left
@@ -83,31 +87,54 @@ class Generator {
     @param unknowns   set of squares where the correct value is unknown
     @return           list of tuples of squares and their only possible value
    */
-  static List<Tuple2<int, int>> onePossibleLeft(
-      HashMap<int, HashSet<int>> possible, HashSet<int> unknowns){
+   List<Tuple2<int, int>> onePossibleLeft(){
       List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
-      unknowns.forEach((square){
-        if(possible[square].isEmpty){
+      this.unknowns.forEach((square){
+        if(this.possible[square].isEmpty){
           // not possible to solve
-          const error = const Tuple2<int, int>(99, 99);
-          return [error];
+          List<Tuple2<int, int>> error = [Tuple2<int, int>(99, 99)];
+          return error;
         }
-        else if(possible[square].length == 1){
+        else if(this.possible[square].length == 1){
           // must be that square's value
-          newKnowns.add(Tuple2<int, int>(square, possible[square].first));
+          newKnowns.add(Tuple2<int, int>(square, this.possible[square].first));
         }
       });
       return newKnowns;
+  } // onePossibleLeft()
+
+  /*
+    Check for errors and set the values of the new known squares
+
+    @param newKnowns  List of new known squares and their values
+    @return bool      false if problem in the board, true otherwise
+   */
+  bool setNewKnowns(List<Tuple2<int, int>> newKnowns){
+    var isError = isNewKnownError(newKnowns);
+    if(isError){
+      return false;
+    }
+    newKnowns.forEach((known) {
+      var square = known.item1;
+      int row = square ~/ 10;
+      int col = square % 10;
+      var value = known.item2;
+      this.unknowns.remove(square);
+      this.knowns.add(square);
+      this.board[row][col] = value;
+      this.possible[square] = null;
+    });
+    return true;
   }
 
   /*
     Checks if any of these new values are duplicate values in the same
     row, column, or block of 9 squares
 
-    @param newKnowns  List of new squares and their values
+    @param newKnowns  List of new known squares and their values
     @return           true if duplicate, false otherwise
    */
-  static bool isNewKnownError(List<Tuple2<int, int>> newKnowns){
+   bool isNewKnownError(List<Tuple2<int, int>> newKnowns){
     if (newKnowns.length < 2){
       return false;
     }
@@ -143,12 +170,12 @@ class Generator {
     @param board  current state of the board
     @return       true if duplicate, false otherwise
    */
-  static bool isError(List<List<int>> board){
+   bool isError(){
     // row
     for (var r = 0; r < 9; r++){
       var rowSet = HashSet<int>();
       for (var c = 0; c < 9; c++){
-        var boardValue = board[r][c];
+        var boardValue = this.board[r][c];
         if(boardValue != null){
           if(rowSet.contains(boardValue)){
             return true;
@@ -164,7 +191,7 @@ class Generator {
     for (var c = 0; c < 9; c++){
       var columnSet = HashSet<int>();
       for (var r = 0; r < 9; r++){
-        var boardValue = board[r][c];
+        var boardValue = this.board[r][c];
         if(boardValue != null){
           if(columnSet.contains(boardValue)){
             return true;
@@ -184,7 +211,7 @@ class Generator {
           for(var c = 0; c < 3; c++){
             var row = rindex * 3 + r;
             var column = cindex * 3 + c;
-            var boardValue = board[row][column];
+            var boardValue = this.board[row][column];
             if(boardValue != null) {
               if (groupSet.contains(boardValue)) {
                 return true;
@@ -199,6 +226,6 @@ class Generator {
     } // for rindex
 
     return false;
-  }
+  } // isError()
 
 }
