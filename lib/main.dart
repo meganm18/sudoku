@@ -28,136 +28,6 @@ void main() {
       print("$r, $c: ${g.board[r][c]}");
     }
   }
-  /*List<List<int>> testBoard = [
-    [null, null, null, null, null, 4, null, 2, 8],
-    [4, null, 6, null, null, null, null, null, 5],
-    [1, null, null, null, 3, null, 6, null, null],
-    [null, null, null, 3, null, 1, null, null, null],
-    [null, 8, 7, null, null, null, 1, 4, null],
-    [null, null, null, 7, null, 9, null, null, null],
-    [null, null, 2, null, 1, null, null, null, 3],
-    [9, null, null, null, null, null, 5, null, 7],
-    [6, 7, null, 4, null, null, null, null, null]
-  ];*/
-  /*var newKnowns = g.onePossibleLeft();
-  if(newKnowns.length > 0) {
-    newKnowns.forEach((element) {
-      print(element);
-    });
-  }
-  print("________________________");
-  newKnowns = g.oneLeftRowColBox();
-  if(newKnowns.length > 0) {
-    newKnowns.forEach((element) {
-      print(element);
-    });
-  }
-  print("________________________");
-  print(g.setNewKnowns(newKnowns));
-  for (var r = 0; r < 9; r ++){
-    for(var c = 0; c < 9; c++){
-      print("$r, $c: ${g.board[r][c]}");
-    }
-  }*/
-  /*
-  List<List<int>> testBoard = [
-  [null, null, null, 1, null, 5, null, null, null],
-  [1, 4, null, null, null, null, 6, 7, null],
-  [null, 8, null, null, null, 2, 4, null, null],
-  [null, 6, 3, null, 7, null, null, 1, null],
-  [9, null, null, null, null, null, null, null, 3],
-  [null, 1, null, null, 9, null, 5, 2, null],
-  [null, null, 7, 2, null, null, null, 8, null],
-  [null, 2, 6, null, null, null, null, 3, 5],
-  [null, null, null, 4, null, 9, null, null, null]
-  ];
-  g.board = testBoard;
-  g.solver();
-  var newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("__________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.setNewKnowns(newKnowns));
-  newKnowns = g.onePossibleLeft();
-  newKnowns.forEach((element) {
-    print(element);
-  });
-  print("___________________________");
-  print(g.isSolved());
-  for (var r = 0; r < 9; r ++){
-    for(var c = 0; c < 9; c++){
-      print("$r, $c: ${g.board[r][c]}");
-    }
-  }
-   */
-
   runApp(MyApp());
 }
 
@@ -168,29 +38,19 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
         primarySwatch: Colors.green,
         // This makes the visual density adapt to the platform that you run
         // the app on. For desktop platforms, the controls will be smaller and
         // closer together (more dense) than on mobile platforms.
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: MyHomePage(title: 'Suduko'),
+      home: MyHomePage(title: 'Sudoku'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
-
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
   // how it looks.
@@ -208,8 +68,16 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  Generator _generator = Generator();
 
-  void _incrementCounter() {
+  void _solveBoard() {
+    setState(() {
+      _counter++;
+      _generator.board = _generator.solver();
+      });
+  }
+
+  /*void _incrementCounter() {
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -218,7 +86,7 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -250,14 +118,14 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: _solveBoard,
         tooltip: 'Increment',
-        child: Icon(Icons.add),
+        child: Text("Solve"),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
-  Widget _buildSquare(String num) => Container(
+  Widget _buildSquare(int num) => Container(
       decoration: BoxDecoration(
         border: Border.all(width: 5, color: Colors.black26),
       ),
@@ -266,10 +134,28 @@ class _MyHomePageState extends State<MyHomePage> {
           child:
           TextField(
              decoration: InputDecoration(
-               hintText: num
+               hintText: squareNumToValue(num)
              )
           )
       ));
+
+  /*
+    Converts the number the square has (box # and where within the box)
+    to the value in the grid (based on key based on row and column overall)
+   */
+  String squareNumToValue(int num) {
+    int box = num ~/ 10;
+    int boxRow = box ~/ 3;
+    int boxCol = box % 3;
+
+    int within = num % 10;
+    int withinRow = within ~/ 3;
+    int withinCol = within % 3;
+
+    int row = boxRow * 3 + withinRow;
+    int col = boxCol * 3 + withinCol;
+    return _generator.board[row][col].toString();
+  }
 
   Widget _buildBox(int ct) => Row(children: [
         Flexible(
@@ -277,20 +163,47 @@ class _MyHomePageState extends State<MyHomePage> {
                 decoration: BoxDecoration(
                     border: Border.all(width: 5, color: Colors.black)),
                 child: GridView.count(
-                    crossAxisCount: 3, children: _buildSquareList(9))))
+                    crossAxisCount: 3, children: _buildSquareList(ct))))
       ]);
 
   List<Container> _buildSquareList(int ct) => List.generate(
-      9, (i) => Container(child: _buildSquare((i + 1).toString())));
+      9, (i) => Container(child: _buildSquare((ct * 10 + i))));
 
   Widget _buildGrid() => Row(children: [
         Flexible(
             child: Container(
                 decoration: BoxDecoration(
                     border: Border.all(width: 5, color: Colors.black)),
+            // couldn't figure out how to change input with GridView.count()
                 child: GridView.count(
                     crossAxisCount: 3, children: _buildBoxList())))
-      ]);
+            /*child: Column(
+                children: [
+                    Row(
+                        children: [
+                          _buildBox(0),
+                          _buildBox(1),
+                          _buildBox(2),
+                        ]
+                    ),
+                    Row(
+                    children: [
+                    _buildBox(3),
+                    _buildBox(4),
+                    _buildBox(5),
+                    ]
+                    ),
+                    Row(
+                    children: [
+                    _buildBox(6),
+                    _buildBox(7),
+                    _buildBox(8),
+                    ]
+                    )
+                  ]
+            ))) */
+            ]
+      );
 
   List<Container> _buildBoxList() =>
       List.generate(9, (i) => Container(child: _buildBox(i)));
