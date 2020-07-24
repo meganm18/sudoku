@@ -54,7 +54,11 @@ class Generator {
       if (newKnowns.isEmpty) {
         newKnowns = this.oneLeftRowColBox();
         if (newKnowns.isEmpty){
-          this.pairsAndTriplets();
+          var isChanged = this.pairsAndTriplets();
+          if(!isChanged){
+            // no changes so solver cannot currently find a solution
+            return List<List<int>>.filled(9, List<int>.filled(9, null));
+          }
         }
       }
       this.setNewKnowns(newKnowns);
@@ -298,27 +302,34 @@ class Generator {
       // value is all of the squares that could be that value
       // for Method (1) as described above
       HashMap<int, HashSet<int>> valueCounts = HashMap<int, HashSet<int>>();
+      valueCounts.addEntries({
+        1: HashSet<int>(), 2: HashSet<int>(), 3:HashSet<int>(),
+        4: HashSet<int>(), 5: HashSet<int>(), 6: HashSet<int>(),
+        7: HashSet<int>(), 8: HashSet<int>(), 9: HashSet<int>()
+      }.entries);
       // for Method (2) as described above
       var possiblePairs = List<int>();
       var possibleTriples = List<int>();
       for(var c = 0; c < 9; c++){
         var key = r * 10 + c;
-        if (this.possible[key].length == 2){
-          possiblePairs.add(key);
-        }
-        else if (this.possible[key].length == 3){
-          possibleTriples.add(key);
-        }
-        this.possible[key].forEach((value) {
-          if(valueCounts.containsKey(value)){
-            valueCounts[value].add(key);
+        if(this.possible.containsKey(key) && this.unknowns.contains(key)) {
+          if (this.possible[key].length == 2) {
+            possiblePairs.add(key);
           }
-          else{
-            var newSet = HashSet<int>();
-            newSet.add(key);
-            valueCounts[value] = newSet;
+          else if (this.possible[key].length == 3) {
+            possibleTriples.add(key);
           }
-        });
+          this.possible[key].forEach((value) {
+            if (valueCounts.containsKey(value)) {
+              valueCounts[value].add(key);
+            }
+            else {
+              var newSet = HashSet<int>();
+              newSet.add(key);
+              valueCounts[value] = newSet;
+            }
+          });
+        }
 
       } // for col
 
@@ -391,7 +402,7 @@ class Generator {
               var secondValue = this.possible[key2].toList()[1];
               for (var col2 = 0; col2 < 9; col2++){
                 var key = r * 10 + col2;
-                if (key != key1 && key != key2){
+                if (key != key1 && key != key2 && this.unknowns.contains(key)){
                   this.possible[key].remove(firstValue);
                   this.possible[key].remove(secondValue);
                 }
@@ -406,9 +417,9 @@ class Generator {
         for (var i = 0; i < (possibleTriples.length - 2); i++){
           for (var j = i + 1; j < (possibleTriples.length - 1); j++){
             for (var k = j + 1; k < possibleTriples.length; k ++){
-              var key1 = possiblePairs[i];
-              var key2 = possiblePairs[j];
-              var key3 = possiblePairs[k];
+              var key1 = possibleTriples[i];
+              var key2 = possibleTriples[j];
+              var key3 = possibleTriples[k];
               // if there is a pair
               if (this.possible[key1].intersection(this.possible[key2])
                   .intersection(this.possible[key3]).length == 3){
@@ -419,7 +430,7 @@ class Generator {
                 var thirdValue = this.possible[key3].toList()[2];
                 for (var col2 = 0; col2 < 9; col2++){
                   var key = r * 10 + col2;
-                  if (key != key1 && key != key2 && key != key3) {
+                  if (key != key1 && key != key2 && key != key3 && this.unknowns.contains(key)) {
                     this.possible[key].remove(firstValue);
                     this.possible[key].remove(secondValue);
                     this.possible[key].remove(thirdValue);
@@ -441,27 +452,34 @@ class Generator {
       // value is all of the squares that could be that value
       // for Method (1) as described above
       HashMap<int, HashSet<int>> valueCounts = HashMap<int, HashSet<int>>();
+      valueCounts.addEntries({
+        1: HashSet<int>(), 2: HashSet<int>(), 3:HashSet<int>(),
+        4: HashSet<int>(), 5: HashSet<int>(), 6: HashSet<int>(),
+        7: HashSet<int>(), 8: HashSet<int>(), 9: HashSet<int>()
+      }.entries);
       // for Method (2) as described above
       var possiblePairs = List<int>();
       var possibleTriples = List<int>();
       for(var r = 0; r < 9; r++){
         var key = r * 10 + c;
-        if (this.possible[key].length == 2){
-          possiblePairs.add(key);
-        }
-        else if (this.possible[key].length == 3){
-          possibleTriples.add(key);
-        }
-        this.possible[key].forEach((value) {
-          if(valueCounts.containsKey(value)){
-            valueCounts[value].add(key);
+        if(this.possible.containsKey(key) && this.unknowns.contains(key)) {
+          if (this.possible[key].length == 2) {
+            possiblePairs.add(key);
           }
-          else{
-            var newSet = HashSet<int>();
-            newSet.add(key);
-            valueCounts[value] = newSet;
+          else if (this.possible[key].length == 3) {
+            possibleTriples.add(key);
           }
-        });
+          this.possible[key].forEach((value) {
+            if (valueCounts.containsKey(value)) {
+              valueCounts[value].add(key);
+            }
+            else {
+              var newSet = HashSet<int>();
+              newSet.add(key);
+              valueCounts[value] = newSet;
+            }
+          });
+        }
 
       } // for row
 
@@ -534,7 +552,7 @@ class Generator {
               var secondValue = this.possible[key2].toList()[1];
               for (var row2 = 0; row2 < 9; row2++){
                 var key = row2 * 10 + c;
-                if (key != key1 && key != key2){
+                if (key != key1 && key != key2 && this.unknowns.contains(key)){
                   this.possible[key].remove(firstValue);
                   this.possible[key].remove(secondValue);
                 }
@@ -549,9 +567,9 @@ class Generator {
         for (var i = 0; i < (possibleTriples.length - 2); i++){
           for (var j = i + 1; j < (possibleTriples.length - 1); j++){
             for (var k = j + 1; k < possibleTriples.length; k ++){
-              var key1 = possiblePairs[i];
-              var key2 = possiblePairs[j];
-              var key3 = possiblePairs[k];
+              var key1 = possibleTriples[i];
+              var key2 = possibleTriples[j];
+              var key3 = possibleTriples[k];
               // if there is a pair
               if (this.possible[key1].intersection(this.possible[key2])
                   .intersection(this.possible[key3]).length == 3){
@@ -562,7 +580,7 @@ class Generator {
                 var thirdValue = this.possible[key3].toList()[2];
                 for (var row2 = 0; row2 < 9; row2++){
                   var key = row2 * 10 + c;
-                  if (key != key1 && key != key2 && key != key3) {
+                  if (key != key1 && key != key2 && key != key3 && this.unknowns.contains(key)) {
                     this.possible[key].remove(firstValue);
                     this.possible[key].remove(secondValue);
                     this.possible[key].remove(thirdValue);
@@ -585,6 +603,11 @@ class Generator {
       for (var colIndex = 0; colIndex < 3; colIndex++){
         // for Method (1) as described above
         HashMap<int, HashSet<int>> valueCounts = HashMap<int, HashSet<int>>();
+        valueCounts.addEntries({
+          1: HashSet<int>(), 2: HashSet<int>(), 3:HashSet<int>(),
+          4: HashSet<int>(), 5: HashSet<int>(), 6: HashSet<int>(),
+          7: HashSet<int>(), 8: HashSet<int>(), 9: HashSet<int>()
+        }.entries);
         // for Method (2) as described above
         var possiblePairs = List<int>();
         var possibleTriples = List<int>();
@@ -594,22 +617,24 @@ class Generator {
             var row = rowIndex * 3 + r;
             var col = colIndex * 3 + c;
             var key = row * 10 + col;
-            if (this.possible[key].length == 2) {
-              possiblePairs.add(key);
-            }
-            else if (this.possible[key].length == 3) {
-              possibleTriples.add(key);
-            }
-            this.possible[key].forEach((value) {
-              if (valueCounts.containsKey(value)) {
-                valueCounts[value].add(key);
+            if(this.possible.containsKey(key) && this.unknowns.contains(key)) {
+              if (this.possible[key].length == 2) {
+                possiblePairs.add(key);
               }
-              else {
-                var newSet = HashSet<int>();
-                newSet.add(key);
-                valueCounts[value] = newSet;
+              else if (this.possible[key].length == 3) {
+                possibleTriples.add(key);
               }
-            });
+              this.possible[key].forEach((value) {
+                if (valueCounts.containsKey(value)) {
+                  valueCounts[value].add(key);
+                }
+                else {
+                  var newSet = HashSet<int>();
+                  newSet.add(key);
+                  valueCounts[value] = newSet;
+                }
+              });
+            }
           } // for c
         } // for r
 
@@ -685,7 +710,7 @@ class Generator {
                     var row = rowIndex * 3 + row2;
                     var col = colIndex * 3 + col2;
                     var key = row * 10 + col;
-                    if (key != key1 && key != key2) {
+                    if (key != key1 && key != key2 && this.unknowns.contains(key)) {
                       this.possible[key].remove(firstValue);
                       this.possible[key].remove(secondValue);
                     }
@@ -701,9 +726,9 @@ class Generator {
           for (var i = 0; i < (possibleTriples.length - 2); i++){
             for (var j = i + 1; j < (possibleTriples.length - 1); j++){
               for (var k = j + 1; k < possibleTriples.length; k ++){
-                var key1 = possiblePairs[i];
-                var key2 = possiblePairs[j];
-                var key3 = possiblePairs[k];
+                var key1 = possibleTriples[i];
+                var key2 = possibleTriples[j];
+                var key3 = possibleTriples[k];
                 // if there is a pair
                 if (this.possible[key1].intersection(this.possible[key2])
                     .intersection(this.possible[key3]).length == 3){
@@ -717,7 +742,7 @@ class Generator {
                       var row = rowIndex * 3 + row2;
                       var col = colIndex * 3 + col2;
                       var key = row * 10 + col;
-                      if (key != key1 && key != key2 && key != key3) {
+                      if (key != key1 && key != key2 && key != key3 && this.unknowns.contains(key)) {
                         this.possible[key].remove(firstValue);
                         this.possible[key].remove(secondValue);
                         this.possible[key].remove(thirdValue);
