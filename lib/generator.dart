@@ -9,16 +9,32 @@ import 'package:tuple/tuple.dart';
  */
 
 class Generator {
-  List<List<int>> board; // need to create size
+  List<List<int>> board;
+  List<List<int>> givenBoard;
   Set<int> unknowns;
   Set<int> knowns;
   HashMap<int, HashSet<int>> possible;
 
   Generator(){
     this.board = List<List<int>>.filled(9, List<int>.filled(9, null));
+    this.givenBoard = List<List<int>>.filled(9, List<int>.filled(9, null));
     this.unknowns = Set<int>();
     this.knowns = Set<int>();
     this.possible = HashMap<int, HashSet<int>>();
+
+    //for testing purposes
+    var testBoard = [
+      [7, 2, null, null, 9, 6, null, null, 3],
+      [null, null, null, 2, null, 5, null, null, null],
+      [null, 8, null, null, null, 4, null, 2, null],
+      [null, null, null, null, null, null, null, 6, null],
+      [1, null, 6, 5, null, 3, 8, null, 7],
+      [null, 4, null, null, null, null, null, null, null],
+      [null, 3, null, 8, null, null, null, 9, null],
+      [null, null, null, 7, null, 2, null, null, null],
+      [2, null, null, 4, 3, null, null, 1, 8]
+    ];
+    this.board = testBoard;
   }
 
   static void makeBoard() {
@@ -27,6 +43,9 @@ class Generator {
 
   List<List<int>> solver() {
     // map key will be 2 digit #: first represents cell's row index, second is col index
+
+    // this.possible, this.knowns, and this.unknowns should be updated through
+    // the generation process so may be able to comment out later
     for (var i = 0; i < 9; i++) {
       for (var j = 0; j < 9; j++) {
         var key = i * 10 + j;
