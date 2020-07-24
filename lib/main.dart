@@ -1,6 +1,163 @@
 import 'package:flutter/material.dart';
 
+import 'generator.dart';
+
+// import 'dart:async';
+// import 'package:path/path.dart';
+// import 'package:sqflite/sqflite.dart';
+
 void main() {
+  // testing
+  Generator.makeBoard();
+  Generator g = Generator();
+  List<List<int>> testBoard = [
+    [7, 2, null, null, 9, 6, null, null, 3],
+    [null, null, null, 2, null, 5, null, null, null],
+    [null, 8, null, null, null, 4, null, 2, null],
+    [null, null, null, null, null, null, null, 6, null],
+    [1, null, 6, 5, null, 3, 8, null, 7],
+    [null, 4, null, null, null, null, null, null, null],
+    [null, 3, null, 8, null, null, null, 9, null],
+    [null, null, null, 7, null, 2, null, null, null],
+    [2, null, null, 4, 3, null, null, 1, 8]
+  ];
+  g.board = testBoard;
+  g.solver();
+  for (var r = 0; r < 9; r ++){
+    for(var c = 0; c < 9; c++){
+      print("$r, $c: ${g.board[r][c]}");
+    }
+  }
+  /*List<List<int>> testBoard = [
+    [null, null, null, null, null, 4, null, 2, 8],
+    [4, null, 6, null, null, null, null, null, 5],
+    [1, null, null, null, 3, null, 6, null, null],
+    [null, null, null, 3, null, 1, null, null, null],
+    [null, 8, 7, null, null, null, 1, 4, null],
+    [null, null, null, 7, null, 9, null, null, null],
+    [null, null, 2, null, 1, null, null, null, 3],
+    [9, null, null, null, null, null, 5, null, 7],
+    [6, 7, null, 4, null, null, null, null, null]
+  ];*/
+  /*var newKnowns = g.onePossibleLeft();
+  if(newKnowns.length > 0) {
+    newKnowns.forEach((element) {
+      print(element);
+    });
+  }
+  print("________________________");
+  newKnowns = g.oneLeftRowColBox();
+  if(newKnowns.length > 0) {
+    newKnowns.forEach((element) {
+      print(element);
+    });
+  }
+  print("________________________");
+  print(g.setNewKnowns(newKnowns));
+  for (var r = 0; r < 9; r ++){
+    for(var c = 0; c < 9; c++){
+      print("$r, $c: ${g.board[r][c]}");
+    }
+  }*/
+  /*
+  List<List<int>> testBoard = [
+  [null, null, null, 1, null, 5, null, null, null],
+  [1, 4, null, null, null, null, 6, 7, null],
+  [null, 8, null, null, null, 2, 4, null, null],
+  [null, 6, 3, null, 7, null, null, 1, null],
+  [9, null, null, null, null, null, null, null, 3],
+  [null, 1, null, null, 9, null, 5, 2, null],
+  [null, null, 7, 2, null, null, null, 8, null],
+  [null, 2, 6, null, null, null, null, 3, 5],
+  [null, null, null, 4, null, 9, null, null, null]
+  ];
+  g.board = testBoard;
+  g.solver();
+  var newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("__________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.isSolved());
+  for (var r = 0; r < 9; r ++){
+    for(var c = 0; c < 9; c++){
+      print("$r, $c: ${g.board[r][c]}");
+    }
+  }
+   */
+
   runApp(MyApp());
 }
 
@@ -73,22 +230,12 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
         title: Text(widget.title),
       ),
       body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
         child: Column(
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-
             Text(
               'You have pushed the button this many times:',
             ),
@@ -96,8 +243,9 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
-            _buildSquare("9"),
-            _buildBox(9),
+            Expanded(
+              child: _buildGrid(),
+            ),
           ],
         ),
       ),
@@ -109,55 +257,41 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildSquare(String Num) => Container(
-    decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black26),
-      ),
-    child: 
-      Container(
-          child: Text(Num)
-      )
-  );
-
-  Widget _buildBox(int ct) => Flexible(
-    child: Container(
+  Widget _buildSquare(String num) => Container(
       decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black)
-    ),
-      child: GridView.count(
-        crossAxisCount: 3,
-        children:
-          _buildSquareList(9)
-      )
-  ));
+        border: Border.all(width: 5, color: Colors.black26),
+      ),
+      alignment: Alignment(0, 0),
+      child: Container(
+          child:
+          TextField(
+             decoration: InputDecoration(
+               hintText: num
+             )
+          )
+      ));
+
+  Widget _buildBox(int ct) => Row(children: [
+        Flexible(
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 5, color: Colors.black)),
+                child: GridView.count(
+                    crossAxisCount: 3, children: _buildSquareList(9))))
+      ]);
 
   List<Container> _buildSquareList(int ct) => List.generate(
-    9, (i) => Container(child: _buildSquare((i+1).toString())));
+      9, (i) => Container(child: _buildSquare((i + 1).toString())));
 
-  Widget _buildGrid() => GridView.count(
-   /* decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black38)
-    )*/
-   crossAxisCount: 3,
-   mainAxisSpacing: 3.0,
-   crossAxisSpacing: 3.0,
-   children: _buildBoxList());
+  Widget _buildGrid() => Row(children: [
+        Flexible(
+            child: Container(
+                decoration: BoxDecoration(
+                    border: Border.all(width: 5, color: Colors.black)),
+                child: GridView.count(
+                    crossAxisCount: 3, children: _buildBoxList())))
+      ]);
 
-
-  List<Container> _buildBoxList() => List.generate(
-    9, (i) => Container(child: _buildBox(i)));
-
-
-  /*Widget _buildBox() => Container(
-    decoration: BoxDecoration(
-      border: Border.all(width: 10, color: Colors.black38),
-    ),
-    child: Column(
-      children: [
-        _buildRow(),
-        _buildRow(),
-        _buildRow(),
-      ]
-    )
-  );*/
+  List<Container> _buildBoxList() =>
+      List.generate(9, (i) => Container(child: _buildBox(i)));
 }
