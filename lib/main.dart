@@ -7,7 +7,141 @@ import 'generator.dart';
 // import 'package:sqflite/sqflite.dart';
 
 void main() {
+  // testing
   Generator.makeBoard();
+  Generator g = Generator();
+  List<List<int>> testBoard = [
+    [null, null, null, null, null, 4, null, 2, 8],
+    [4, null, 6, null, null, null, null, null, 5],
+    [1, null, null, null, 3, null, 6, null, null],
+    [null, null, null, 3, null, 1, null, null, null],
+    [null, 8, 7, null, null, null, 1, 4, null],
+    [null, null, null, 7, null, 9, null, null, null],
+    [null, null, 2, null, 1, null, null, null, 3],
+    [9, null, null, null, null, null, 5, null, 7],
+    [6, 7, null, 4, null, null, null, null, null]
+  ];
+  g.board = testBoard;
+  g.solver();
+  var newKnowns = g.onePossibleLeft();
+  if(newKnowns.length > 0) {
+    newKnowns.forEach((element) {
+      print(element);
+    });
+  }
+  print("________________________");
+  newKnowns = g.oneLeftRowColBox();
+  if(newKnowns.length > 0) {
+    newKnowns.forEach((element) {
+      print(element);
+    });
+  }
+  print("________________________");
+  print(g.setNewKnowns(newKnowns));
+  for (var r = 0; r < 9; r ++){
+    for(var c = 0; c < 9; c++){
+      print("$r, $c: ${g.board[r][c]}");
+    }
+  }
+  /*
+  List<List<int>> testBoard = [
+  [null, null, null, 1, null, 5, null, null, null],
+  [1, 4, null, null, null, null, 6, 7, null],
+  [null, 8, null, null, null, 2, 4, null, null],
+  [null, 6, 3, null, 7, null, null, 1, null],
+  [9, null, null, null, null, null, null, null, 3],
+  [null, 1, null, null, 9, null, 5, 2, null],
+  [null, null, 7, 2, null, null, null, 8, null],
+  [null, 2, 6, null, null, null, null, 3, 5],
+  [null, null, null, 4, null, 9, null, null, null]
+  ];
+  g.board = testBoard;
+  g.solver();
+  var newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("__________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.setNewKnowns(newKnowns));
+  newKnowns = g.onePossibleLeft();
+  newKnowns.forEach((element) {
+    print(element);
+  });
+  print("___________________________");
+  print(g.isSolved());
+  for (var r = 0; r < 9; r ++){
+    for(var c = 0; c < 9; c++){
+      print("$r, $c: ${g.board[r][c]}");
+    }
+  }
+   */
+
   runApp(MyApp());
 }
 
