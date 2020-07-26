@@ -50,20 +50,27 @@ class Generator {
   @return   Returns the new (solved) board or if a problem, a board with null values
    */
   List<List<int>> makeBoard(){
-    //Random random = new Random();
-    this.reset();
-    var returnedBoard = this.tryOptions(this.board, this.unknowns, this.knowns, this.possible);
-    if (returnedBoard[0][0] == null){
-      print("Error");
+    var i = 0;
+    while (i < 10000) {
+      i++;
+      this.reset();
+      var returnedBoard = this.tryOptions(
+          this.board, this.unknowns, this.knowns, this.possible);
+      if (returnedBoard[0][0] == null) {
+        print("Error");
+      }
+      else {
+        print("Success");
+        this.board = returnedBoard;
+        this.solver();
+        var boardError = this.isError();
+        print("boardError: $boardError");
+        if(!boardError) {
+          break;
+        }
+      }
     }
-    else{
-      print("Success");
-      this.board = returnedBoard;
-      this.solver();
-      var boardError = this.isError();
-      print("boardError: $boardError");
-    }
-  return returnedBoard;
+  return this.board;
   }
 
   /*
