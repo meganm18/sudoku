@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'package:tuple/tuple.dart';
+import 'dart:math';
 
 /*
   QUESTIONS:
@@ -15,13 +16,20 @@ class Generator {
   Set<int> knowns;
   HashMap<int, HashSet<int>> possible;
 
-  Generator(){
+  Generator() {
     this.board = List<List<int>>.filled(9, List<int>.filled(9, null));
     this.givenBoard = List<List<int>>.filled(9, List<int>.filled(9, null));
-    this.unknowns = Set<int>();
+    this.unknowns = <int>{
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+      20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+      40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58,
+      60, 61, 62, 63, 64, 65, 66, 67, 68, 70, 71, 72, 73, 74, 75, 76, 77, 78,
+      80, 81, 82, 83, 84, 85, 86, 87, 88
+    };
     this.knowns = Set<int>();
     this.possible = HashMap<int, HashSet<int>>();
 
+    /*
     //for testing purposes
     var testBoard = [
       [7, 2, null, null, 9, 6, null, null, 3],
@@ -34,18 +42,147 @@ class Generator {
       [null, null, null, 7, null, 2, null, null, null],
       [2, null, null, 4, 3, null, null, 1, 8]
     ];
-    this.board = testBoard;
+    this.board = testBoard; */
   }
 
-  static void makeBoard() {
-    print("hi");
+  void makeBoard(){
+    //Random random = new Random();
+    this.reset();
+    // can complete first row ob 3x3 boxes without worrying
+    // about the board becoming impossible?
+    /*for(var cIndex = 0; cIndex < 3; cIndex++){
+      for(var row = 0; row < 3; row++) {
+        for (var c = 0; c < 3; c++) {
+          var col = cIndex * 3 + c;
+          var key = row * 10 + col;
+          print("key: $key");
+          var value = this.possible[key].toList()[random.nextInt(
+              this.possible[key].length)];
+          this.board[row][col] = value;
+          this.unknowns.remove(key);
+          this.knowns.add(key);
+          this.updatePossible(key, value);
+        }
+      }
+    }*/
+    var returnedBoard = this.tryOptions(this.board, this.unknowns, this.knowns, this.possible);
+    if (returnedBoard[0][0] == null){
+      print("Error");
+    }
+    else{
+      print("Success");
+      this.board = returnedBoard;
+    }
+
+  }
+
+  List<List<int>> tryOptions(List<List<int>> board, Set<int> unknowns, Set<int> knowns,
+      HashMap<int, HashSet<int>> possible){
+    Random random = new Random();
+    // fill an unknown square at random and update parameters
+    var fillSquare = unknowns.toList()[random.nextInt(unknowns.length)];
+    int row = fillSquare ~/ 10;
+    int col = fillSquare % 10;
+    knowns.add(fillSquare);
+    unknowns.remove(fillSquare);
+    while(possible[fillSquare].length > 0){
+      var fillValue = possible[fillSquare].toList()
+        [random.nextInt(possible[fillSquare].length)];
+      board[row][col] = fillValue;
+      print("fillSquare: $fillSquare and fillValue: $fillValue");
+      possible = this.updatePossibleBoard(possible, fillSquare, fillValue);
+      if(unknowns.length > 0) {
+        if (tryOptions(board, unknowns, knowns, possible)[0][0] != null) {
+          return board;
+        }
+      }
+      else{
+        return board;
+      }
+    }
+    return List<List<int>>.filled(9, List<int>.filled(9, null));
+  }
+
+  /*
+    void makeBoard() {
+    var i = 0;
+    var error = false;
+    while (!this.isSolved()) {
+      print("i: $i");
+      i++;
+      this.reset();
+      error = false;
+      // minimum number of givens for a solvable grid is 17
+      for (var i = 0; i < 17; i++) {
+        Random random = new Random();
+        var fillSquare =
+            this.unknowns.toList()[random.nextInt(this.unknowns.length)];
+        if (this.possible[fillSquare].length == 0){
+          //not solvable, try again
+          error = true;
+          break;
+        }
+        var fillValue = this
+            .possible[fillSquare]
+            .toList()[random.nextInt(this.possible[fillSquare].length)];
+        //print('i: $i, fillSquare: $fillSquare, fillValue: $fillValue');
+        int squareRow = fillSquare ~/ 10;
+        int squareCol = fillSquare % 10;
+        this.givenBoard[squareRow][squareCol] = fillValue;
+        this.knowns.add(fillSquare);
+        this.unknowns.remove(fillSquare);
+        this.updatePossible(fillSquare, fillValue);
+      }
+      if(!error){
+        this.board = this.givenBoard;
+        this.solver();
+        while(!this.isSolved() && !error){
+          Random random = new Random();
+          var fillSquare =
+          this.unknowns.toList()[random.nextInt(this.unknowns.length)];
+          if (this.possible[fillSquare].length == 0){
+            //not solvable, try again
+            error = true;
+            break;
+          }
+          var fillValue = this
+              .possible[fillSquare]
+              .toList()[random.nextInt(this.possible[fillSquare].length)];
+          //print('i: $i, fillSquare: $fillSquare, fillValue: $fillValue');
+          int squareRow = fillSquare ~/ 10;
+          int squareCol = fillSquare % 10;
+          this.givenBoard[squareRow][squareCol] = fillValue;
+          this.knowns.add(fillSquare);
+          this.unknowns.remove(fillSquare);
+          this.updatePossible(fillSquare, fillValue);
+        }
+      }
+    }
+    // the board is solvable
+    this.board = this.givenBoard;
+  } // makeBoard()
+  */
+
+  /*
+  Resets board, givenBoard, unknowns, knowns, and possible
+   */
+  void reset() {
+    this.board = List<List<int>>.filled(9, List<int>.filled(9, null));
+    this.givenBoard = List<List<int>>.filled(9, List<int>.filled(9, null));
+    this.knowns = Set<int>();
+    for (var i = 0; i < 9; i++) {
+      for (var j = 0; j < 9; j++) {
+        var key = i * 10 + j;
+        var value = HashSet<int>.from([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        this.possible[key] = value;
+        this.unknowns.add(key);
+      } // for j
+    } // for i
   }
 
   List<List<int>> solver() {
     // map key will be 2 digit #: first represents cell's row index, second is col index
-
-    // this.possible, this.knowns, and this.unknowns should be updated through
-    // the generation process so may be able to comment out later
+    //may not need beginning -- may already be like that from generation process
     for (var i = 0; i < 9; i++) {
       for (var j = 0; j < 9; j++) {
         var key = i * 10 + j;
@@ -67,20 +204,38 @@ class Generator {
       this.updatePossible(key, value);
     });
 
-    while(!this.isSolved()){
+    while (!this.isSolved()) {
       var newKnowns = List<Tuple2<int, int>>();
       newKnowns = this.onePossibleLeft();
-      if (newKnowns.isEmpty) {
+      if (newKnowns.isNotEmpty) {
+        if (newKnowns[0].item1 == 99) {
+          //error
+          return List<List<int>>.filled(9, List<int>.filled(9, null));
+        }
+      } else {
         newKnowns = this.oneLeftRowColBox();
-        if (newKnowns.isEmpty){
+        if (newKnowns.isEmpty) {
           var isChanged = this.pairsAndTriplets();
-          if(!isChanged){
+          if (!isChanged) {
             // no changes so solver cannot currently find a solution
             return List<List<int>>.filled(9, List<int>.filled(9, null));
           }
         }
       }
-      this.setNewKnowns(newKnowns);
+      if (newKnowns ==
+          [
+            Tuple2(99, 99)
+          ]) {
+        return List<List<int>>.filled(9, List<int>.filled(9, null));
+      }
+      if (newKnowns.isNotEmpty) {
+        if (newKnowns[0].item1 == 99) {
+          return List<List<int>>.filled(9, List<int>.filled(9, null));
+        }
+      }
+      if (!this.setNewKnowns(newKnowns)) {
+        return List<List<int>>.filled(9, List<int>.filled(9, null));
+      }
     } // end while
 
     return this.board;
@@ -92,9 +247,9 @@ class Generator {
     @param newKnowns  List of new known squares and their values
     @return bool      false if problem in the board, true otherwise
    */
-  bool setNewKnowns(List<Tuple2<int, int>> newKnowns){
-    var isError = isNewKnownError(newKnowns);
-    if(isError){
+  bool setNewKnowns(List<Tuple2<int, int>> newKnowns) {
+    var isNewError = isNewKnownError(newKnowns);
+    if (isNewError) {
       return false;
     }
     newKnowns.forEach((known) {
@@ -119,43 +274,84 @@ class Generator {
    @param key       key of the recently found square (row*10 + column)
    @param value     known value of the recently found square
    */
-   void updatePossible(int key, int value) {
-      int rowNum = key ~/ 10;
-      int colNum = key % 10;
-      // update row and column
-      for (var i = 0; i < 9; i++){
-        var rowKey = rowNum * 10 + i;
-        var colKey = i * 10 + colNum;
-        if (this.possible[rowKey] != null) {
-          this.possible[rowKey].remove(value);
-        }
-        if (this.possible[colKey] != null){
-          this.possible[colKey].remove(value);
+  void updatePossible(int key, int value) {
+    int rowNum = key ~/ 10;
+    int colNum = key % 10;
+    // update row and column
+    for (var i = 0; i < 9; i++) {
+      var rowKey = rowNum * 10 + i;
+      var colKey = i * 10 + colNum;
+      if (this.possible[rowKey] != null) {
+        this.possible[rowKey].remove(value);
+      }
+      if (this.possible[colKey] != null) {
+        this.possible[colKey].remove(value);
+      }
+    }
+    // update block of 9
+    // find beginning of block based on relative position
+    int rowIndex = rowNum % 3;
+    int colIndex = colNum % 3;
+    int firstRow = rowNum - rowIndex;
+    int firstCol = colNum - colIndex;
+    for (var r = firstRow; r <= firstRow + 2; r++) {
+      for (var c = firstCol; c <= firstCol + 2; c++) {
+        var blockKey = r * 10 + c;
+        if (this.possible[blockKey] != null) {
+          this.possible[blockKey].remove(value);
         }
       }
-      // update block of 9
-      // find beginning of block based on relative position
-      int rowIndex = rowNum % 3;
-      int colIndex = colNum % 3;
-      int firstRow = rowNum - rowIndex;
-      int firstCol = colNum - colIndex;
-      for (var r = firstRow; r <= firstRow + 2; r++) {
-        for (var c = firstCol; c <= firstCol + 2; c++) {
-          var blockKey = r * 10 + c;
-          if (this.possible[blockKey] != null){
-            this.possible[blockKey].remove(value);
-          }
-        }
-      }
+    }
   } // updatePossible()
+
+  /*
+   Update possible values of the squares in the same row, column, and block
+   of the recently found square but update the passed in possible map.
+
+   @param possible  map of possible values for all of the squares
+   @param key       key of the recently found square (row*10 + column)
+   @param value     known value of the recently found square
+   @return          updated possible map
+   */
+  HashMap<int, HashSet<int>> updatePossibleBoard(HashMap<int,
+      HashSet<int>> possible, int key, int value) {
+    int rowNum = key ~/ 10;
+    int colNum = key % 10;
+    // update row and column
+    for (var i = 0; i < 9; i++) {
+      var rowKey = rowNum * 10 + i;
+      var colKey = i * 10 + colNum;
+      if (possible[rowKey] != null) {
+        possible[rowKey].remove(value);
+      }
+      if (possible[colKey] != null) {
+        possible[colKey].remove(value);
+      }
+    }
+    // update block of 9
+    // find beginning of block based on relative position
+    int rowIndex = rowNum % 3;
+    int colIndex = colNum % 3;
+    int firstRow = rowNum - rowIndex;
+    int firstCol = colNum - colIndex;
+    for (var r = firstRow; r <= firstRow + 2; r++) {
+      for (var c = firstCol; c <= firstCol + 2; c++) {
+        var blockKey = r * 10 + c;
+        if (possible[blockKey] != null) {
+          possible[blockKey].remove(value);
+        }
+      }
+    }
+    return possible;
+  } // updatePossibleBoard()
 
   /*
     Determines if the board is solved.
 
     @return true if board is solved, false otherwise
    */
-  bool isSolved(){
-     return this.unknowns.isEmpty;
+  bool isSolved() {
+    return this.unknowns.isEmpty;
   }
 
   /*
@@ -165,141 +361,168 @@ class Generator {
     @param unknowns   set of squares where the correct value is unknown
     @return           list of tuples of squares and their only possible value
    */
-   List<Tuple2<int, int>> onePossibleLeft(){
-      List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
-      var error = false;
-      this.unknowns.forEach((square){
-        if(this.possible[square].isEmpty){
-          // not possible to solve
-          error = true;
-          //return error; // gave an error when uncommented
-        }
-        else if(this.possible[square].length == 1){
-          // must be that square's value
-          newKnowns.add(Tuple2<int, int>(square, this.possible[square].first));
-        }
-      });
-      if (error){
-        return [Tuple2<int, int>(99, 99)];
+  List<Tuple2<int, int>> onePossibleLeft() {
+    List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
+    var error = false;
+    this.unknowns.forEach((square) {
+      if (this.possible[square].isEmpty) {
+        // not possible to solve
+        print("THE ERROR IS AT SQUARE $square");
+        error = true;
+        //return error; // gave an error when uncommented
+      } else if (this.possible[square].length == 1) {
+        // must be that square's value
+        newKnowns.add(Tuple2<int, int>(square, this.possible[square].first));
       }
-      return newKnowns;
+    });
+    if (error) {
+      return [Tuple2<int, int>(99, 99)];
+    }
+    return newKnowns;
   } // onePossibleLeft()
 
-  List<Tuple2<int, int>> oneLeftRowColBox(){
-     List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
-     // rows
-     for(var r = 0; r < 9; r++){
-       Map<int, int> counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
-       var onlyOne = HashSet<int>();
-       for(var c = 0; c < 9; c++){
-         int key = r * 10 + c;
-         if(unknowns.contains(key)) {
-           this.possible[key].forEach((possible) {
-             counts[possible]++;
-             if (counts[possible] == 1) {
-               onlyOne.add(possible);
-             }
-             else if (onlyOne.contains(possible)) {
-               onlyOne.remove(possible);
-             }
-           });
-         }
-       } // for col
-       //only one square can have a certain value for this row
-       if (onlyOne.isNotEmpty){
-         for (var c = 0; c < 9; c++){
-           int key = r * 10 + c;
-           if(unknowns.contains(key)) {
-             this.possible[key].forEach((possible) {
-               if (onlyOne.contains(possible)) {
-                 newKnowns.add(Tuple2<int, int>(key, possible));
-               }
-             });
-           }
-         } // for col
-       } // if onlyOne not empty
-     } //for row
+  List<Tuple2<int, int>> oneLeftRowColBox() {
+    List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
+    // rows
+    for (var r = 0; r < 9; r++) {
+      Map<int, int> counts = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+        9: 0
+      };
+      var onlyOne = HashSet<int>();
+      for (var c = 0; c < 9; c++) {
+        int key = r * 10 + c;
+        if (unknowns.contains(key)) {
+          this.possible[key].forEach((possible) {
+            counts[possible]++;
+            if (counts[possible] == 1) {
+              onlyOne.add(possible);
+            } else if (onlyOne.contains(possible)) {
+              onlyOne.remove(possible);
+            }
+          });
+        }
+      } // for col
+      //only one square can have a certain value for this row
+      if (onlyOne.isNotEmpty) {
+        for (var c = 0; c < 9; c++) {
+          int key = r * 10 + c;
+          if (unknowns.contains(key)) {
+            this.possible[key].forEach((possible) {
+              if (onlyOne.contains(possible)) {
+                newKnowns.add(Tuple2<int, int>(key, possible));
+              }
+            });
+          }
+        } // for col
+      } // if onlyOne not empty
+    } //for row
 
-     // columns
-     for(var c = 0; c < 9; c++){
-       Map<int, int> counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
-       var onlyOne = HashSet<int>();
-       for(var r = 0; r < 9; r++){
-         int key = r * 10 + c;
-         if(unknowns.contains(key)) {
-           this.possible[key].forEach((possible) {
-             counts[possible]++;
-             if (counts[possible] == 1) {
-               onlyOne.add(possible);
-             }
-             else if (onlyOne.contains(possible)) {
-               onlyOne.remove(possible);
-             }
-           });
-         }
-       } // for row
-       //only one square can have a certain value for this row
-       if (onlyOne.isNotEmpty){
-         for (var r = 0; r < 9; r++){
-           int key = r * 10 + c;
-           if(unknowns.contains(key)) {
-             this.possible[key].forEach((possible) {
-               if (onlyOne.contains(possible) && !newKnowns.contains(key)) {
-                 newKnowns.add(Tuple2<int, int>(key, possible));
-               }
-             });
-           }
-         } // for row
-       } // if onlyOne not empty
-     } //for column
+    // columns
+    for (var c = 0; c < 9; c++) {
+      Map<int, int> counts = {
+        1: 0,
+        2: 0,
+        3: 0,
+        4: 0,
+        5: 0,
+        6: 0,
+        7: 0,
+        8: 0,
+        9: 0
+      };
+      var onlyOne = HashSet<int>();
+      for (var r = 0; r < 9; r++) {
+        int key = r * 10 + c;
+        if (unknowns.contains(key)) {
+          this.possible[key].forEach((possible) {
+            counts[possible]++;
+            if (counts[possible] == 1) {
+              onlyOne.add(possible);
+            } else if (onlyOne.contains(possible)) {
+              onlyOne.remove(possible);
+            }
+          });
+        }
+      } // for row
+      //only one square can have a certain value for this row
+      if (onlyOne.isNotEmpty) {
+        for (var r = 0; r < 9; r++) {
+          int key = r * 10 + c;
+          if (unknowns.contains(key)) {
+            this.possible[key].forEach((possible) {
+              if (onlyOne.contains(possible) && !newKnowns.contains(key)) {
+                newKnowns.add(Tuple2<int, int>(key, possible));
+              }
+            });
+          }
+        } // for row
+      } // if onlyOne not empty
+    } //for column
 
-     // for box of 9
-     // boxes are numbered from 0 in row-major order
-     // first 2 for loops iterate through the rows/columns of groups of 9
-     // inner 2 for loops iterate through the rows/columns of that group of 9
-     for (var rIndex = 0; rIndex < 3; rIndex ++){
-       for (var cIndex = 0; cIndex < 3; cIndex ++) {
-         // can now identify a box of 9
-         Map<int, int> counts = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, 7: 0, 8: 0, 9: 0};
-         var onlyOne = HashSet<int>();
-         for (var r = 0; r < 3; r++){
-           for (var c = 0; c < 3; c++){
-             var row = rIndex * 3 + r;
-             var col = cIndex * 3 + c;
-             var key = row * 10 + col;
-             if(unknowns.contains(key)) {
-               this.possible[key].forEach((possible) {
-                 counts[possible]++;
-                 if (counts[possible] == 1) {
-                   onlyOne.add(possible);
-                 }
-                 else if (onlyOne.contains(possible)) {
-                   onlyOne.remove(possible);
-                 }
-               });
-             }
-           } // for c
-         } // for r
-         if (onlyOne.isNotEmpty){
-           for (var r = 0; r < 3; r++){
-             for (var c = 0; c < 3; c++) {
-               var row = rIndex * 3 + r;
-               var col = cIndex * 3 + c;
-               int key = row * 10 + col;
-               if(unknowns.contains(key)) {
-                 this.possible[key].forEach((possible) {
-                   if (onlyOne.contains(possible) && !newKnowns.contains(key)) {
-                     newKnowns.add(Tuple2<int, int>(key, possible));
-                   }
-                 });
-               }
-             } // for c
-           } // for r
-         } // if onlyOne not empty
-       } // for cIndex
-     } // for rIndex
+    // for box of 9
+    // boxes are numbered from 0 in row-major order
+    // first 2 for loops iterate through the rows/columns of groups of 9
+    // inner 2 for loops iterate through the rows/columns of that group of 9
+    for (var rIndex = 0; rIndex < 3; rIndex++) {
+      for (var cIndex = 0; cIndex < 3; cIndex++) {
+        // can now identify a box of 9
+        Map<int, int> counts = {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+          6: 0,
+          7: 0,
+          8: 0,
+          9: 0
+        };
+        var onlyOne = HashSet<int>();
+        for (var r = 0; r < 3; r++) {
+          for (var c = 0; c < 3; c++) {
+            var row = rIndex * 3 + r;
+            var col = cIndex * 3 + c;
+            var key = row * 10 + col;
+            if (unknowns.contains(key)) {
+              this.possible[key].forEach((possible) {
+                counts[possible]++;
+                if (counts[possible] == 1) {
+                  onlyOne.add(possible);
+                } else if (onlyOne.contains(possible)) {
+                  onlyOne.remove(possible);
+                }
+              });
+            }
+          } // for c
+        } // for r
+        if (onlyOne.isNotEmpty) {
+          for (var r = 0; r < 3; r++) {
+            for (var c = 0; c < 3; c++) {
+              var row = rIndex * 3 + r;
+              var col = cIndex * 3 + c;
+              int key = row * 10 + col;
+              if (unknowns.contains(key)) {
+                this.possible[key].forEach((possible) {
+                  if (onlyOne.contains(possible) && !newKnowns.contains(key)) {
+                    newKnowns.add(Tuple2<int, int>(key, possible));
+                  }
+                });
+              }
+            } // for c
+          } // for r
+        } // if onlyOne not empty
+      } // for cIndex
+    } // for rIndex
 
-     return newKnowns;
+    return newKnowns;
   } // oneLeftRowColBox()
 
   /*
@@ -313,64 +536,67 @@ class Generator {
 
     @return   true if it made a change to the possibilities, false otherwise
    */
-  bool pairsAndTriplets(){
+  bool pairsAndTriplets() {
     var returnValue = false;
     // rows
-    for(var r = 0; r < 9; r++){
+    for (var r = 0; r < 9; r++) {
       // key is the value in square (1-9)
       // value is all of the squares that could be that value
       // for Method (1) as described above
       HashMap<int, HashSet<int>> valueCounts = HashMap<int, HashSet<int>>();
       valueCounts.addEntries({
-        1: HashSet<int>(), 2: HashSet<int>(), 3:HashSet<int>(),
-        4: HashSet<int>(), 5: HashSet<int>(), 6: HashSet<int>(),
-        7: HashSet<int>(), 8: HashSet<int>(), 9: HashSet<int>()
+        1: HashSet<int>(),
+        2: HashSet<int>(),
+        3: HashSet<int>(),
+        4: HashSet<int>(),
+        5: HashSet<int>(),
+        6: HashSet<int>(),
+        7: HashSet<int>(),
+        8: HashSet<int>(),
+        9: HashSet<int>()
       }.entries);
       // for Method (2) as described above
       var possiblePairs = List<int>();
       var possibleTriples = List<int>();
-      for(var c = 0; c < 9; c++){
+      for (var c = 0; c < 9; c++) {
         var key = r * 10 + c;
-        if(this.possible.containsKey(key) && this.unknowns.contains(key)) {
+        if (this.possible.containsKey(key) && this.unknowns.contains(key)) {
           if (this.possible[key].length == 2) {
             possiblePairs.add(key);
-          }
-          else if (this.possible[key].length == 3) {
+          } else if (this.possible[key].length == 3) {
             possibleTriples.add(key);
           }
           this.possible[key].forEach((value) {
             if (valueCounts.containsKey(value)) {
               valueCounts[value].add(key);
-            }
-            else {
+            } else {
               var newSet = HashSet<int>();
               newSet.add(key);
               valueCounts[value] = newSet;
             }
           });
         }
-
       } // for col
 
       // for Method (1)
       var possiblePairValues = List<int>();
       var possibleTripleValues = List<int>();
-      for (var i = 1; i < 10; i++){
-        if (valueCounts[i].length == 2){
+      for (var i = 1; i < 10; i++) {
+        if (valueCounts[i].length == 2) {
           possiblePairValues.add(i);
-        }
-        else if (valueCounts[i].length == 3){
+        } else if (valueCounts[i].length == 3) {
           possibleTripleValues.add(i);
         }
       }
       // Method (1) as described above
-      if(possiblePairValues.length >= 2){
-        for (var i = 0; i < (possiblePairValues.length - 1); i++){
-          for (var j = i + 1; j < possiblePairValues.length; j++){
+      if (possiblePairValues.length >= 2) {
+        for (var i = 0; i < (possiblePairValues.length - 1); i++) {
+          for (var j = i + 1; j < possiblePairValues.length; j++) {
             // if those 2 squares are the same
             var value1 = possiblePairValues[i];
             var value2 = possiblePairValues[j];
-            if(valueCounts[value1].intersection(valueCounts[value2]).length == 2){
+            if (valueCounts[value1].intersection(valueCounts[value2]).length ==
+                2) {
               returnValue = true;
               // update so these 2 squares have no other possibilities but these 2 values
               valueCounts[value1].forEach((element) {
@@ -384,16 +610,19 @@ class Generator {
       } // if possiblePairValues.length >= 2
 
       // Method (1) but for triples
-      if(possibleTripleValues.length >= 3){
-        for (var i = 0; i < (possiblePairValues.length - 2); i++){
+      if (possibleTripleValues.length >= 3) {
+        for (var i = 0; i < (possiblePairValues.length - 2); i++) {
           for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
             for (var k = j + 1; k < possiblePairValues.length; k++) {
               // if those 3 squares are the same
               var value1 = possibleTripleValues[i];
               var value2 = possibleTripleValues[j];
               var value3 = possibleTripleValues[k];
-              if (valueCounts[value1].intersection(valueCounts[value2]
-                  .intersection(valueCounts[value3])).length == 3) {
+              if (valueCounts[value1]
+                      .intersection(
+                          valueCounts[value2].intersection(valueCounts[value3]))
+                      .length ==
+                  3) {
                 returnValue = true;
                 // update so these 2 squares have no other possibilities but these 2 values
                 valueCounts[value1].forEach((element) {
@@ -408,20 +637,21 @@ class Generator {
       } // if possibleTripleValues.length >= 3
 
       // Method (2) as described above (pairs)
-      if(possiblePairs.length >= 2){
-        for (var i = 0; i < (possiblePairs.length - 1); i++){
-          for (var j = i + 1; j < possiblePairs.length; j++){
+      if (possiblePairs.length >= 2) {
+        for (var i = 0; i < (possiblePairs.length - 1); i++) {
+          for (var j = i + 1; j < possiblePairs.length; j++) {
             var key1 = possiblePairs[i];
             var key2 = possiblePairs[j];
             // if there is a pair
-            if (this.possible[key1].intersection(this.possible[key2]).length == 2){
+            if (this.possible[key1].intersection(this.possible[key2]).length ==
+                2) {
               returnValue = true;
               // the rest of the squares should not have these as possible
               var firstValue = this.possible[key1].toList()[0];
               var secondValue = this.possible[key2].toList()[1];
-              for (var col2 = 0; col2 < 9; col2++){
+              for (var col2 = 0; col2 < 9; col2++) {
                 var key = r * 10 + col2;
-                if (key != key1 && key != key2 && this.unknowns.contains(key)){
+                if (key != key1 && key != key2 && this.unknowns.contains(key)) {
                   this.possible[key].remove(firstValue);
                   this.possible[key].remove(secondValue);
                 }
@@ -432,24 +662,31 @@ class Generator {
       } // if possiblePairs.length >= 2
 
       // Method (2) as described above but for triplets
-      if(possibleTriples.length >= 3){
-        for (var i = 0; i < (possibleTriples.length - 2); i++){
-          for (var j = i + 1; j < (possibleTriples.length - 1); j++){
-            for (var k = j + 1; k < possibleTriples.length; k ++){
+      if (possibleTriples.length >= 3) {
+        for (var i = 0; i < (possibleTriples.length - 2); i++) {
+          for (var j = i + 1; j < (possibleTriples.length - 1); j++) {
+            for (var k = j + 1; k < possibleTriples.length; k++) {
               var key1 = possibleTriples[i];
               var key2 = possibleTriples[j];
               var key3 = possibleTriples[k];
               // if there is a pair
-              if (this.possible[key1].intersection(this.possible[key2])
-                  .intersection(this.possible[key3]).length == 3){
+              if (this
+                      .possible[key1]
+                      .intersection(this.possible[key2])
+                      .intersection(this.possible[key3])
+                      .length ==
+                  3) {
                 returnValue = true;
                 // the rest of the squares should not have these as possible
                 var firstValue = this.possible[key1].toList()[0];
                 var secondValue = this.possible[key2].toList()[1];
                 var thirdValue = this.possible[key3].toList()[2];
-                for (var col2 = 0; col2 < 9; col2++){
+                for (var col2 = 0; col2 < 9; col2++) {
                   var key = r * 10 + col2;
-                  if (key != key1 && key != key2 && key != key3 && this.unknowns.contains(key)) {
+                  if (key != key1 &&
+                      key != key2 &&
+                      key != key3 &&
+                      this.unknowns.contains(key)) {
                     this.possible[key].remove(firstValue);
                     this.possible[key].remove(secondValue);
                     this.possible[key].remove(thirdValue);
@@ -463,64 +700,66 @@ class Generator {
 
     } // for row
 
-
     //////////////////////////////////////////////////////////////////////////
     // Columns
-    for(var c = 0; c < 9; c++){
+    for (var c = 0; c < 9; c++) {
       // key is the value in square (1-9)
       // value is all of the squares that could be that value
       // for Method (1) as described above
       HashMap<int, HashSet<int>> valueCounts = HashMap<int, HashSet<int>>();
       valueCounts.addEntries({
-        1: HashSet<int>(), 2: HashSet<int>(), 3:HashSet<int>(),
-        4: HashSet<int>(), 5: HashSet<int>(), 6: HashSet<int>(),
-        7: HashSet<int>(), 8: HashSet<int>(), 9: HashSet<int>()
+        1: HashSet<int>(),
+        2: HashSet<int>(),
+        3: HashSet<int>(),
+        4: HashSet<int>(),
+        5: HashSet<int>(),
+        6: HashSet<int>(),
+        7: HashSet<int>(),
+        8: HashSet<int>(),
+        9: HashSet<int>()
       }.entries);
       // for Method (2) as described above
       var possiblePairs = List<int>();
       var possibleTriples = List<int>();
-      for(var r = 0; r < 9; r++){
+      for (var r = 0; r < 9; r++) {
         var key = r * 10 + c;
-        if(this.possible.containsKey(key) && this.unknowns.contains(key)) {
+        if (this.possible.containsKey(key) && this.unknowns.contains(key)) {
           if (this.possible[key].length == 2) {
             possiblePairs.add(key);
-          }
-          else if (this.possible[key].length == 3) {
+          } else if (this.possible[key].length == 3) {
             possibleTriples.add(key);
           }
           this.possible[key].forEach((value) {
             if (valueCounts.containsKey(value)) {
               valueCounts[value].add(key);
-            }
-            else {
+            } else {
               var newSet = HashSet<int>();
               newSet.add(key);
               valueCounts[value] = newSet;
             }
           });
         }
-
       } // for row
 
       // for Method (1)
       var possiblePairValues = List<int>();
       var possibleTripleValues = List<int>();
-      for (var i = 1; i < 10; i++){
-        if (valueCounts[i].length == 2){
+      for (var i = 1; i < 10; i++) {
+        if (valueCounts[i].length == 2) {
           possiblePairValues.add(i);
-        }
-        else if (valueCounts[i].length == 3){
+        } else if (valueCounts[i].length == 3) {
           possibleTripleValues.add(i);
         }
       }
       // Method (1) as described above
-      if(possiblePairValues.length >= 2){
-        for (var i = 0; i < (possiblePairValues.length - 1); i++){
-          for (var j = i + 1; j < possiblePairValues.length; j++){
+      if (possiblePairValues.length >= 2) {
+        for (var i = 0; i < (possiblePairValues.length - 1); i++) {
+          for (var j = i + 1; j < possiblePairValues.length; j++) {
             // if those 2 squares are the same
             var value1 = possiblePairValues[i];
             var value2 = possiblePairValues[j];
-            if(valueCounts[value1].intersection(valueCounts[value2]).length == 2){
+            if (valueCounts[value1].intersection(valueCounts[value2]).length ==
+                2) {
               returnValue = true;
               // update so these 2 squares have no other possibilities but these 2 values
               valueCounts[value1].forEach((element) {
@@ -534,16 +773,19 @@ class Generator {
       } // if possiblePairValues.length >= 2
 
       // Method (1) but for triples
-      if(possibleTripleValues.length >= 3){
-        for (var i = 0; i < (possiblePairValues.length - 2); i++){
+      if (possibleTripleValues.length >= 3) {
+        for (var i = 0; i < (possiblePairValues.length - 2); i++) {
           for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
             for (var k = j + 1; k < possiblePairValues.length; k++) {
               // if those 3 squares are the same
               var value1 = possibleTripleValues[i];
               var value2 = possibleTripleValues[j];
               var value3 = possibleTripleValues[k];
-              if (valueCounts[value1].intersection(valueCounts[value2]
-                  .intersection(valueCounts[value3])).length == 3) {
+              if (valueCounts[value1]
+                      .intersection(
+                          valueCounts[value2].intersection(valueCounts[value3]))
+                      .length ==
+                  3) {
                 returnValue = true;
                 // update so these 2 squares have no other possibilities but these 2 values
                 valueCounts[value1].forEach((element) {
@@ -558,20 +800,21 @@ class Generator {
       } // if possibleTripleValues.length >= 3
 
       // Method (2) as described above (pairs)
-      if(possiblePairs.length >= 2){
-        for (var i = 0; i < (possiblePairs.length - 1); i++){
-          for (var j = i + 1; j < possiblePairs.length; j++){
+      if (possiblePairs.length >= 2) {
+        for (var i = 0; i < (possiblePairs.length - 1); i++) {
+          for (var j = i + 1; j < possiblePairs.length; j++) {
             var key1 = possiblePairs[i];
             var key2 = possiblePairs[j];
             // if there is a pair
-            if (this.possible[key1].intersection(this.possible[key2]).length == 2){
+            if (this.possible[key1].intersection(this.possible[key2]).length ==
+                2) {
               returnValue = true;
               // the rest of the squares should not have these as possible
               var firstValue = this.possible[key1].toList()[0];
               var secondValue = this.possible[key2].toList()[1];
-              for (var row2 = 0; row2 < 9; row2++){
+              for (var row2 = 0; row2 < 9; row2++) {
                 var key = row2 * 10 + c;
-                if (key != key1 && key != key2 && this.unknowns.contains(key)){
+                if (key != key1 && key != key2 && this.unknowns.contains(key)) {
                   this.possible[key].remove(firstValue);
                   this.possible[key].remove(secondValue);
                 }
@@ -582,24 +825,31 @@ class Generator {
       } // if possiblePairs.length >= 2
 
       // Method (2) as described above but for triplets
-      if(possibleTriples.length >= 3){
-        for (var i = 0; i < (possibleTriples.length - 2); i++){
-          for (var j = i + 1; j < (possibleTriples.length - 1); j++){
-            for (var k = j + 1; k < possibleTriples.length; k ++){
+      if (possibleTriples.length >= 3) {
+        for (var i = 0; i < (possibleTriples.length - 2); i++) {
+          for (var j = i + 1; j < (possibleTriples.length - 1); j++) {
+            for (var k = j + 1; k < possibleTriples.length; k++) {
               var key1 = possibleTriples[i];
               var key2 = possibleTriples[j];
               var key3 = possibleTriples[k];
               // if there is a pair
-              if (this.possible[key1].intersection(this.possible[key2])
-                  .intersection(this.possible[key3]).length == 3){
+              if (this
+                      .possible[key1]
+                      .intersection(this.possible[key2])
+                      .intersection(this.possible[key3])
+                      .length ==
+                  3) {
                 returnValue = true;
                 // the rest of the squares should not have these as possible
                 var firstValue = this.possible[key1].toList()[0];
                 var secondValue = this.possible[key2].toList()[1];
                 var thirdValue = this.possible[key3].toList()[2];
-                for (var row2 = 0; row2 < 9; row2++){
+                for (var row2 = 0; row2 < 9; row2++) {
                   var key = row2 * 10 + c;
-                  if (key != key1 && key != key2 && key != key3 && this.unknowns.contains(key)) {
+                  if (key != key1 &&
+                      key != key2 &&
+                      key != key3 &&
+                      this.unknowns.contains(key)) {
                     this.possible[key].remove(firstValue);
                     this.possible[key].remove(secondValue);
                     this.possible[key].remove(thirdValue);
@@ -612,20 +862,25 @@ class Generator {
       } // if possibleTriples.length >= 3
     } // for each column
 
-
     ///////////////////////////////////////////////////////////////////////////
     // for each box of 9
     // boxes are indexed started at 0 and labeled in row-major order
     // rowIndex and colIndex are for row and column index of the box
     // r and c refer to row and column index within each box
-    for (var rowIndex = 0; rowIndex < 3; rowIndex++){
-      for (var colIndex = 0; colIndex < 3; colIndex++){
+    for (var rowIndex = 0; rowIndex < 3; rowIndex++) {
+      for (var colIndex = 0; colIndex < 3; colIndex++) {
         // for Method (1) as described above
         HashMap<int, HashSet<int>> valueCounts = HashMap<int, HashSet<int>>();
         valueCounts.addEntries({
-          1: HashSet<int>(), 2: HashSet<int>(), 3:HashSet<int>(),
-          4: HashSet<int>(), 5: HashSet<int>(), 6: HashSet<int>(),
-          7: HashSet<int>(), 8: HashSet<int>(), 9: HashSet<int>()
+          1: HashSet<int>(),
+          2: HashSet<int>(),
+          3: HashSet<int>(),
+          4: HashSet<int>(),
+          5: HashSet<int>(),
+          6: HashSet<int>(),
+          7: HashSet<int>(),
+          8: HashSet<int>(),
+          9: HashSet<int>()
         }.entries);
         // for Method (2) as described above
         var possiblePairs = List<int>();
@@ -636,18 +891,16 @@ class Generator {
             var row = rowIndex * 3 + r;
             var col = colIndex * 3 + c;
             var key = row * 10 + col;
-            if(this.possible.containsKey(key) && this.unknowns.contains(key)) {
+            if (this.possible.containsKey(key) && this.unknowns.contains(key)) {
               if (this.possible[key].length == 2) {
                 possiblePairs.add(key);
-              }
-              else if (this.possible[key].length == 3) {
+              } else if (this.possible[key].length == 3) {
                 possibleTriples.add(key);
               }
               this.possible[key].forEach((value) {
                 if (valueCounts.containsKey(value)) {
                   valueCounts[value].add(key);
-                }
-                else {
+                } else {
                   var newSet = HashSet<int>();
                   newSet.add(key);
                   valueCounts[value] = newSet;
@@ -660,22 +913,24 @@ class Generator {
         // for Method (1)
         var possiblePairValues = List<int>();
         var possibleTripleValues = List<int>();
-        for (var i = 1; i < 10; i++){
-          if (valueCounts[i].length == 2){
+        for (var i = 1; i < 10; i++) {
+          if (valueCounts[i].length == 2) {
             possiblePairValues.add(i);
-          }
-          else if (valueCounts[i].length == 3){
+          } else if (valueCounts[i].length == 3) {
             possibleTripleValues.add(i);
           }
         }
         // Method (1) as described above
-        if(possiblePairValues.length >= 2){
-          for (var i = 0; i < (possiblePairValues.length - 1); i++){
-            for (var j = i + 1; j < possiblePairValues.length; j++){
+        if (possiblePairValues.length >= 2) {
+          for (var i = 0; i < (possiblePairValues.length - 1); i++) {
+            for (var j = i + 1; j < possiblePairValues.length; j++) {
               // if those 2 squares are the same
               var value1 = possiblePairValues[i];
               var value2 = possiblePairValues[j];
-              if(valueCounts[value1].intersection(valueCounts[value2]).length == 2){
+              if (valueCounts[value1]
+                      .intersection(valueCounts[value2])
+                      .length ==
+                  2) {
                 returnValue = true;
                 // update so these 2 squares have no other possibilities but these 2 values
                 valueCounts[value1].forEach((element) {
@@ -689,16 +944,19 @@ class Generator {
         } // if possiblePairValues.length >= 2
 
         // Method (1) but for triples
-        if(possibleTripleValues.length >= 3){
-          for (var i = 0; i < (possiblePairValues.length - 2); i++){
+        if (possibleTripleValues.length >= 3) {
+          for (var i = 0; i < (possiblePairValues.length - 2); i++) {
             for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
               for (var k = j + 1; k < possiblePairValues.length; k++) {
                 // if those 3 squares are the same
                 var value1 = possibleTripleValues[i];
                 var value2 = possibleTripleValues[j];
                 var value3 = possibleTripleValues[k];
-                if (valueCounts[value1].intersection(valueCounts[value2]
-                    .intersection(valueCounts[value3])).length == 3) {
+                if (valueCounts[value1]
+                        .intersection(valueCounts[value2]
+                            .intersection(valueCounts[value3]))
+                        .length ==
+                    3) {
                   returnValue = true;
                   // update so these 2 squares have no other possibilities but these 2 values
                   valueCounts[value1].forEach((element) {
@@ -713,23 +971,29 @@ class Generator {
         } // if possibleTripleValues.length >= 3
 
         // Method (2) as described above (pairs)
-        if(possiblePairs.length >= 2){
-          for (var i = 0; i < (possiblePairs.length - 1); i++){
-            for (var j = i + 1; j < possiblePairs.length; j++){
+        if (possiblePairs.length >= 2) {
+          for (var i = 0; i < (possiblePairs.length - 1); i++) {
+            for (var j = i + 1; j < possiblePairs.length; j++) {
               var key1 = possiblePairs[i];
               var key2 = possiblePairs[j];
               // if there is a pair
-              if (this.possible[key1].intersection(this.possible[key2]).length == 2){
+              if (this
+                      .possible[key1]
+                      .intersection(this.possible[key2])
+                      .length ==
+                  2) {
                 returnValue = true;
                 // the rest of the squares should not have these as possible
                 var firstValue = this.possible[key1].toList()[0];
                 var secondValue = this.possible[key2].toList()[1];
-                for (var row2 = 0; row2 < 9; row2++){
-                  for (var col2 = 0; col2 < 3; col2++){
+                for (var row2 = 0; row2 < 9; row2++) {
+                  for (var col2 = 0; col2 < 3; col2++) {
                     var row = rowIndex * 3 + row2;
                     var col = colIndex * 3 + col2;
                     var key = row * 10 + col;
-                    if (key != key1 && key != key2 && this.unknowns.contains(key)) {
+                    if (key != key1 &&
+                        key != key2 &&
+                        this.unknowns.contains(key)) {
                       this.possible[key].remove(firstValue);
                       this.possible[key].remove(secondValue);
                     }
@@ -741,16 +1005,20 @@ class Generator {
         } // if possiblePairs.length >= 2
 
         // Method (2) as described above but for triplets
-        if(possibleTriples.length >= 3){
-          for (var i = 0; i < (possibleTriples.length - 2); i++){
-            for (var j = i + 1; j < (possibleTriples.length - 1); j++){
-              for (var k = j + 1; k < possibleTriples.length; k ++){
+        if (possibleTriples.length >= 3) {
+          for (var i = 0; i < (possibleTriples.length - 2); i++) {
+            for (var j = i + 1; j < (possibleTriples.length - 1); j++) {
+              for (var k = j + 1; k < possibleTriples.length; k++) {
                 var key1 = possibleTriples[i];
                 var key2 = possibleTriples[j];
                 var key3 = possibleTriples[k];
                 // if there is a pair
-                if (this.possible[key1].intersection(this.possible[key2])
-                    .intersection(this.possible[key3]).length == 3){
+                if (this
+                        .possible[key1]
+                        .intersection(this.possible[key2])
+                        .intersection(this.possible[key3])
+                        .length ==
+                    3) {
                   returnValue = true;
                   // the rest of the squares should not have these as possible
                   var firstValue = this.possible[key1].toList()[0];
@@ -761,7 +1029,10 @@ class Generator {
                       var row = rowIndex * 3 + row2;
                       var col = colIndex * 3 + col2;
                       var key = row * 10 + col;
-                      if (key != key1 && key != key2 && key != key3 && this.unknowns.contains(key)) {
+                      if (key != key1 &&
+                          key != key2 &&
+                          key != key3 &&
+                          this.unknowns.contains(key)) {
                         this.possible[key].remove(firstValue);
                         this.possible[key].remove(secondValue);
                         this.possible[key].remove(thirdValue);
@@ -776,7 +1047,7 @@ class Generator {
       } // for colIndex
     } // for rowIndex
 
-  return returnValue;
+    return returnValue;
   }
 
   /*
@@ -786,32 +1057,33 @@ class Generator {
     @param newKnowns  List of new known squares and their values
     @return           true if duplicate, false otherwise
    */
-   bool isNewKnownError(List<Tuple2<int, int>> newKnowns){
-    if (newKnowns.length < 2){
+  bool isNewKnownError(List<Tuple2<int, int>> newKnowns) {
+    if (newKnowns.length < 2) {
       return false;
     }
     // list is probably small enough that it is faster to loop through
     // repeatedly as opposed to checking each row, col, and box of 9
-    for(var i = 0; i < (newKnowns.length - 1); i++){
+    for (var i = 0; i < (newKnowns.length - 1); i++) {
       var square = newKnowns[i].item1;
       int row = square ~/ 10;
       int col = square % 10;
       // boxes are numbered starting with 0 in row-major order
       int box = (row ~/ 3) * 3 + (col ~/ 3);
       var value = newKnowns[i].item2;
-      for(var j = i + 1; j < newKnowns.length; j++){
-        if(newKnowns[j].item2 == value){
+      for (var j = i + 1; j < newKnowns.length; j++) {
+        if (newKnowns[j].item2 == value) {
           var square2 = newKnowns[j].item1;
           int row2 = square2 ~/ 10;
           int col2 = square2 % 10;
           int box2 = (row2 ~/ 3) * 3 + (col2 ~/ 3);
-          if (((row == row2) || (col == col2) || (box == box2)) && square != square2){
+          if (((row == row2) || (col == col2) || (box == box2)) &&
+              square != square2) {
             return true;
           } // if duplicate values in row/col/group
         } // if duplicate values
       } // for j
     } // for i
-   return false;
+    return false;
   } // isNewKnownError()
 
   /*
@@ -822,17 +1094,16 @@ class Generator {
     @param board  current state of the board
     @return       true if duplicate, false otherwise
    */
-   bool isError(){
+  bool isError() {
     // row
-    for (var r = 0; r < 9; r++){
+    for (var r = 0; r < 9; r++) {
       var rowSet = HashSet<int>();
-      for (var c = 0; c < 9; c++){
+      for (var c = 0; c < 9; c++) {
         var boardValue = this.board[r][c];
-        if(boardValue != null){
-          if(rowSet.contains(boardValue)){
+        if (boardValue != null) {
+          if (rowSet.contains(boardValue)) {
             return true;
-          }
-          else{
+          } else {
             rowSet.add(boardValue);
           }
         } // if not null
@@ -840,15 +1111,14 @@ class Generator {
     } // for row
 
     // column
-    for (var c = 0; c < 9; c++){
+    for (var c = 0; c < 9; c++) {
       var columnSet = HashSet<int>();
-      for (var r = 0; r < 9; r++){
+      for (var r = 0; r < 9; r++) {
         var boardValue = this.board[r][c];
-        if(boardValue != null){
-          if(columnSet.contains(boardValue)){
+        if (boardValue != null) {
+          if (columnSet.contains(boardValue)) {
             return true;
-          }
-          else{
+          } else {
             columnSet.add(boardValue);
           }
         } // if not null
@@ -856,19 +1126,18 @@ class Generator {
     } // for col
 
     // square of 9
-    for(var rindex = 0; rindex < 3; rindex++){
-      for(var cindex = 0; cindex < 3; cindex++){
+    for (var rindex = 0; rindex < 3; rindex++) {
+      for (var cindex = 0; cindex < 3; cindex++) {
         var groupSet = HashSet<int>();
-        for(var r = 0; r < 3; r++){
-          for(var c = 0; c < 3; c++){
+        for (var r = 0; r < 3; r++) {
+          for (var c = 0; c < 3; c++) {
             var row = rindex * 3 + r;
             var column = cindex * 3 + c;
             var boardValue = this.board[row][column];
-            if(boardValue != null) {
+            if (boardValue != null) {
               if (groupSet.contains(boardValue)) {
                 return true;
-              }
-              else {
+              } else {
                 groupSet.add(boardValue);
               }
             } // if not null

@@ -8,9 +8,10 @@ import 'generator.dart';
 
 void main() {
   // testing
-  Generator.makeBoard();
+  //Generator.makeBoard();
   Generator g = Generator();
-  List<List<int>> testBoard = [
+  g.makeBoard();
+  /*List<List<int>> testBoard = [
     [7, 2, null, null, 9, 6, null, null, 3],
     [null, null, null, 2, null, 5, null, null, null],
     [null, 8, null, null, null, 4, null, 2, null],
@@ -21,13 +22,18 @@ void main() {
     [null, null, null, 7, null, 2, null, null, null],
     [2, null, null, 4, 3, null, null, 1, 8]
   ];
-  g.board = testBoard;
-  g.solver();
-  for (var r = 0; r < 9; r ++){
-    for(var c = 0; c < 9; c++){
+  g.board = testBoard;*/
+  for (var r = 0; r < 9; r++) {
+    for (var c = 0; c < 9; c++) {
       print("$r, $c: ${g.board[r][c]}");
     }
   }
+  /*g.solver();
+  for (var r = 0; r < 9; r++) {
+    for (var c = 0; c < 9; c++) {
+      print("$r, $c: ${g.board[r][c]}");
+    }
+  }*/
   runApp(MyApp());
 }
 
@@ -74,7 +80,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
       _generator.board = _generator.solver();
-      });
+    });
   }
 
   /*void _incrementCounter() {
@@ -131,13 +137,8 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       alignment: Alignment(0, 0),
       child: Container(
-          child:
-          TextField(
-             decoration: InputDecoration(
-               hintText: squareNumToValue(num)
-             )
-          )
-      ));
+          child: TextField(
+              decoration: InputDecoration(hintText: squareNumToValue(num)))));
 
   /*
     Converts the number the square has (box # and where within the box)
@@ -166,18 +167,18 @@ class _MyHomePageState extends State<MyHomePage> {
                     crossAxisCount: 3, children: _buildSquareList(ct))))
       ]);
 
-  List<Container> _buildSquareList(int ct) => List.generate(
-      9, (i) => Container(child: _buildSquare((ct * 10 + i))));
+  List<Container> _buildSquareList(int ct) =>
+      List.generate(9, (i) => Container(child: _buildSquare((ct * 10 + i))));
 
   Widget _buildGrid() => Row(children: [
         Flexible(
             child: Container(
                 decoration: BoxDecoration(
                     border: Border.all(width: 5, color: Colors.black)),
-            // couldn't figure out how to change input with GridView.count()
+                // couldn't figure out how to change input with GridView.count()
                 child: GridView.count(
                     crossAxisCount: 3, children: _buildBoxList())))
-            /*child: Column(
+        /*child: Column(
                 children: [
                     Row(
                         children: [
@@ -202,8 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     )
                   ]
             ))) */
-            ]
-      );
+      ]);
 
   List<Container> _buildBoxList() =>
       List.generate(9, (i) => Container(child: _buildBox(i)));
