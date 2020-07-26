@@ -17,8 +17,8 @@ class Generator {
   HashMap<int, HashSet<int>> possible;
 
   Generator() {
-    this.board = List<List<int>>.filled(9, List<int>.filled(9, null));
-    this.givenBoard = List<List<int>>.filled(9, List<int>.filled(9, null));
+    this.board = List.generate(9, (i) => List(9), growable: false);
+    this.givenBoard = List.generate(9, (i) => List(9), growable: false);
     this.unknowns = <int>{
       0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18,
       20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38,
@@ -45,26 +45,13 @@ class Generator {
     this.board = testBoard; */
   }
 
-  void makeBoard(){
+  /*
+  Creates a new board (no difficulty level yet)
+  @return   Returns the new (solved) board or if a problem, a board with null values
+   */
+  List<List<int>> makeBoard(){
     //Random random = new Random();
     this.reset();
-    // can complete first row ob 3x3 boxes without worrying
-    // about the board becoming impossible?
-    /*for(var cIndex = 0; cIndex < 3; cIndex++){
-      for(var row = 0; row < 3; row++) {
-        for (var c = 0; c < 3; c++) {
-          var col = cIndex * 3 + c;
-          var key = row * 10 + col;
-          print("key: $key");
-          var value = this.possible[key].toList()[random.nextInt(
-              this.possible[key].length)];
-          this.board[row][col] = value;
-          this.unknowns.remove(key);
-          this.knowns.add(key);
-          this.updatePossible(key, value);
-        }
-      }
-    }*/
     var returnedBoard = this.tryOptions(this.board, this.unknowns, this.knowns, this.possible);
     if (returnedBoard[0][0] == null){
       print("Error");
@@ -72,13 +59,21 @@ class Generator {
     else{
       print("Success");
       this.board = returnedBoard;
+      this.solver();
+      var boardError = this.isError();
+      print("boardError: $boardError");
     }
-
+  return returnedBoard;
   }
 
+  /*
+  Recursive helper method to aid in board generation
+  @return   Returns the new (solved) board or if a problem, a board with null values
+   */
   List<List<int>> tryOptions(List<List<int>> board, Set<int> unknowns, Set<int> knowns,
       HashMap<int, HashSet<int>> possible){
     Random random = new Random();
+    var oldPossible = possible;
     // fill an unknown square at random and update parameters
     var fillSquare = unknowns.toList()[random.nextInt(unknowns.length)];
     int row = fillSquare ~/ 10;
@@ -91,84 +86,45 @@ class Generator {
       board[row][col] = fillValue;
       print("fillSquare: $fillSquare and fillValue: $fillValue");
       possible = this.updatePossibleBoard(possible, fillSquare, fillValue);
+      // check if this was the last unknown square
       if(unknowns.length > 0) {
-        if (tryOptions(board, unknowns, knowns, possible)[0][0] != null) {
-          return board;
+        // see if solvable (minimum number of clues for it to be solvable is 17)
+        if(knowns.length >= 17){
+          this.board = board;
+          var solvedBoard = this.solver();
+          if (solvedBoard[0][0] != null){
+            return solvedBoard;
+          }
+        }
+        var copyBoard = board;
+        var copyUnknowns = unknowns;
+        var copyKnowns = knowns;
+        var copyPossible = possible;
+        var recurseBoard = tryOptions(copyBoard, copyUnknowns, copyKnowns, copyPossible);
+        if (recurseBoard[0][0] != null) {
+          return recurseBoard;
+        }
+        else{
+          // need to updo updatepossible
+          // need this square to be a different value
+          possible = oldPossible;
+          possible[fillSquare].remove(fillValue);
         }
       }
       else{
         return board;
       }
     }
-    return List<List<int>>.filled(9, List<int>.filled(9, null));
+    print("nope");
+    return List.generate(9, (i) => List(9), growable: false);
   }
-
-  /*
-    void makeBoard() {
-    var i = 0;
-    var error = false;
-    while (!this.isSolved()) {
-      print("i: $i");
-      i++;
-      this.reset();
-      error = false;
-      // minimum number of givens for a solvable grid is 17
-      for (var i = 0; i < 17; i++) {
-        Random random = new Random();
-        var fillSquare =
-            this.unknowns.toList()[random.nextInt(this.unknowns.length)];
-        if (this.possible[fillSquare].length == 0){
-          //not solvable, try again
-          error = true;
-          break;
-        }
-        var fillValue = this
-            .possible[fillSquare]
-            .toList()[random.nextInt(this.possible[fillSquare].length)];
-        //print('i: $i, fillSquare: $fillSquare, fillValue: $fillValue');
-        int squareRow = fillSquare ~/ 10;
-        int squareCol = fillSquare % 10;
-        this.givenBoard[squareRow][squareCol] = fillValue;
-        this.knowns.add(fillSquare);
-        this.unknowns.remove(fillSquare);
-        this.updatePossible(fillSquare, fillValue);
-      }
-      if(!error){
-        this.board = this.givenBoard;
-        this.solver();
-        while(!this.isSolved() && !error){
-          Random random = new Random();
-          var fillSquare =
-          this.unknowns.toList()[random.nextInt(this.unknowns.length)];
-          if (this.possible[fillSquare].length == 0){
-            //not solvable, try again
-            error = true;
-            break;
-          }
-          var fillValue = this
-              .possible[fillSquare]
-              .toList()[random.nextInt(this.possible[fillSquare].length)];
-          //print('i: $i, fillSquare: $fillSquare, fillValue: $fillValue');
-          int squareRow = fillSquare ~/ 10;
-          int squareCol = fillSquare % 10;
-          this.givenBoard[squareRow][squareCol] = fillValue;
-          this.knowns.add(fillSquare);
-          this.unknowns.remove(fillSquare);
-          this.updatePossible(fillSquare, fillValue);
-        }
-      }
-    }
-    // the board is solvable
-    this.board = this.givenBoard;
-  } // makeBoard()
-  */
 
   /*
   Resets board, givenBoard, unknowns, knowns, and possible
    */
   void reset() {
-    this.board = List<List<int>>.filled(9, List<int>.filled(9, null));
-    this.givenBoard = List<List<int>>.filled(9, List<int>.filled(9, null));
+    this.board = List.generate(9, (i) => List(9), growable: false);
+    this.givenBoard = List.generate(9, (i) => List(9), growable: false);
     this.knowns = Set<int>();
     for (var i = 0; i < 9; i++) {
       for (var j = 0; j < 9; j++) {
@@ -203,14 +159,15 @@ class Generator {
       int value = this.board[row][col];
       this.updatePossible(key, value);
     });
-
-    while (!this.isSolved()) {
+    int i = 0;
+    while (!this.isSolved() && i < 10000) {
+      i++;
       var newKnowns = List<Tuple2<int, int>>();
       newKnowns = this.onePossibleLeft();
       if (newKnowns.isNotEmpty) {
         if (newKnowns[0].item1 == 99) {
           //error
-          return List<List<int>>.filled(9, List<int>.filled(9, null));
+          return List.generate(9, (i) => List(9), growable: false);
         }
       } else {
         newKnowns = this.oneLeftRowColBox();
@@ -218,7 +175,7 @@ class Generator {
           var isChanged = this.pairsAndTriplets();
           if (!isChanged) {
             // no changes so solver cannot currently find a solution
-            return List<List<int>>.filled(9, List<int>.filled(9, null));
+            return List.generate(9, (i) => List(9), growable: false);
           }
         }
       }
@@ -226,18 +183,21 @@ class Generator {
           [
             Tuple2(99, 99)
           ]) {
-        return List<List<int>>.filled(9, List<int>.filled(9, null));
+        return List.generate(9, (i) => List(9), growable: false);
       }
       if (newKnowns.isNotEmpty) {
         if (newKnowns[0].item1 == 99) {
-          return List<List<int>>.filled(9, List<int>.filled(9, null));
+          return List.generate(9, (i) => List(9), growable: false);
         }
       }
       if (!this.setNewKnowns(newKnowns)) {
-        return List<List<int>>.filled(9, List<int>.filled(9, null));
+        return List.generate(9, (i) => List(9), growable: false);
       }
     } // end while
-
+    if (i == 10000){
+      print("i: $i");
+      return List.generate(9, (i) => List(9), growable: false);
+    }
     return this.board;
   } // solver()
 

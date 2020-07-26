@@ -79,7 +79,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _solveBoard() {
     setState(() {
       _counter++;
-      _generator.board = _generator.solver();
+      _generator.board = _generator.makeBoard();
     });
   }
 
