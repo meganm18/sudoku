@@ -1,16 +1,16 @@
-# suduko
+# Suduko
 
 A new Flutter application for suduko.
 
-## Getting Started
+# Motivation for building
+My mom prefers Samurai Sudoku but has had trouble finding an app that supports it. I decided to make this to improve my understandings of optimizations and apps.
 
-This project is a starting point for a Flutter application.
+# Current Capabilities
+Currently, the app can display a solved board or solve a partially filled board that it is given. It is very close to being able to convert the solved board it can generate into clues to make the given board.
 
-A few resources to get you started if this is your first Flutter project:
+# Future Work
+I need to improve the user input as it is not as simple as I would like it to be yet. As hinted in the motivation section, I also plan to expand to Samarai Sudoku once I finish up the traditional Sudoku components. I would also like to be able to offer different difficulty levels.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+# Screenshot
+![Sudoku Screenshot](sudokuPicture.png)
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
