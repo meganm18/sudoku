@@ -54,14 +54,13 @@ class Generator {
     while (i < 10000) {
       i++;
       this.reset();
-      var returnedBoard = this.tryOptions(
+      var returnedBoard = this.makeSolvedBoard(
           this.board, this.unknowns, this.knowns, this.possible);
       if (returnedBoard[0][0] == null) {
         print("Error");
       }
       else {
         print("Success");
-        this.board = returnedBoard;
         this.solver();
         var boardError = this.isError();
         print("boardError: $boardError");
@@ -70,14 +69,65 @@ class Generator {
         }
       }
     }
+  this.board = makeClues(this.board);
   return this.board;
+  }
+
+  /*
+    Convert solved board into only the clues
+    @return Board with clues and null for blank locations
+   */
+  List<List<int>> makeClues(List<List<int>> board){
+    Set<int> knowns = <int>{
+      0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+      20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+      40, 41, 42, 43, 44, 45, 46, 47, 48, 50, 51, 52, 53, 54, 55, 56, 57, 58,
+      60, 61, 62, 63, 64, 65, 66, 67, 68, 70, 71, 72, 73, 74, 75, 76, 77, 78,
+      80, 81, 82, 83, 84, 85, 86, 87, 88
+    };
+    Set<int> unknowns = {};
+    Random random = new Random();
+    //start with 81 possible
+    int cantSolveCt = 0;
+    int square = 0;
+    int prior = 0;
+    while(cantSolveCt < 5 && unknowns.length < 61){
+      prior = square;
+      square = knowns.toList()[random.nextInt(knowns.length)];
+      int row = square ~/ 10;
+      int col = square % 10;
+      int value = board[row][col];
+      unknowns.forEach((square) {
+        this.board[square ~/ 10][square % 10] = null;
+      });
+
+      this.board[row][col] = null;
+      var solvedBoard = this.solver();
+      if(solvedBoard[0][0] == null){
+        cantSolveCt++;
+        this.board[row][col] = value;
+        board[row][col] = value;
+      }
+      else{
+        board[row][col] = null;
+        print("just set ${this.board[row][col]}");
+        print("prior ${board[prior ~/ 10][prior % 10]}");
+        knowns.remove(square);
+        unknowns.add(square);
+      }
+    }
+    print("removed: ${unknowns.length}");
+    unknowns.forEach((square) {
+      this.board[square ~/ 10][square % 10] = null;
+    });
+    return board;
   }
 
   /*
   Recursive helper method to aid in board generation
   @return   Returns the new (solved) board or if a problem, a board with null values
    */
-  List<List<int>> tryOptions(List<List<int>> board, Set<int> unknowns, Set<int> knowns,
+  List<List<int>> makeSolvedBoard(List<List<int>> board, Set<int> unknowns, Set<int> knowns,
       HashMap<int, HashSet<int>> possible){
     Random random = new Random();
     var oldPossible = possible;
@@ -107,7 +157,7 @@ class Generator {
         var copyUnknowns = unknowns;
         var copyKnowns = knowns;
         var copyPossible = possible;
-        var recurseBoard = tryOptions(copyBoard, copyUnknowns, copyKnowns, copyPossible);
+        var recurseBoard = makeSolvedBoard(copyBoard, copyUnknowns, copyKnowns, copyPossible);
         if (recurseBoard[0][0] != null) {
           return recurseBoard;
         }
@@ -350,6 +400,7 @@ class Generator {
 
   List<Tuple2<int, int>> oneLeftRowColBox() {
     List<Tuple2<int, int>> newKnowns = new List<Tuple2<int, int>>();
+
     // rows
     for (var r = 0; r < 9; r++) {
       Map<int, int> counts = {
@@ -741,9 +792,9 @@ class Generator {
 
       // Method (1) but for triples
       if (possibleTripleValues.length >= 3) {
-        for (var i = 0; i < (possiblePairValues.length - 2); i++) {
-          for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
-            for (var k = j + 1; k < possiblePairValues.length; k++) {
+        for (var i = 0; i < (possibleTripleValues.length - 2); i++) {
+          for (var j = i + 1; j < (possibleTripleValues.length - 1); j++) {
+            for (var k = j + 1; k < possibleTripleValues.length; k++) {
               // if those 3 squares are the same
               var value1 = possibleTripleValues[i];
               var value2 = possibleTripleValues[j];
@@ -912,9 +963,9 @@ class Generator {
 
         // Method (1) but for triples
         if (possibleTripleValues.length >= 3) {
-          for (var i = 0; i < (possiblePairValues.length - 2); i++) {
-            for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
-              for (var k = j + 1; k < possiblePairValues.length; k++) {
+          for (var i = 0; i < (possibleTripleValues.length - 2); i++) {
+            for (var j = i + 1; j < (possibleTripleValues.length - 1); j++) {
+              for (var k = j + 1; k < possibleTripleValues.length; k++) {
                 // if those 3 squares are the same
                 var value1 = possibleTripleValues[i];
                 var value2 = possibleTripleValues[j];

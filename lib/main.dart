@@ -79,6 +79,13 @@ class _MyHomePageState extends State<MyHomePage> {
   void _solveBoard() {
     setState(() {
       _counter++;
+      _generator.board = _generator.solver();
+    });
+  }
+
+  void _makeBoard(){
+    setState(() {
+      _counter++;
       _generator.board = _generator.makeBoard();
     });
   }
@@ -111,23 +118,35 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
             Expanded(
               child: _buildGrid(),
             ),
+      ],),),
+         floatingActionButton: Column(
+        children: <Widget>[
+          Spacer(),
+            FloatingActionButton(
+                heroTag: null,
+                onPressed: _solveBoard,
+                tooltip: 'Increment',
+                child: Text("Solve"),
+            ),
+             FloatingActionButton(
+              heroTag: null,
+              onPressed: _makeBoard,
+              tooltip: 'Increment',
+              child: Text("Make"),
+            ),
           ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
+      )
+      /*floatingActionButton: FloatingActionButton(
         onPressed: _solveBoard,
         tooltip: 'Increment',
         child: Text("Solve"),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      ),*/ // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
@@ -178,31 +197,6 @@ class _MyHomePageState extends State<MyHomePage> {
                 // couldn't figure out how to change input with GridView.count()
                 child: GridView.count(
                     crossAxisCount: 3, children: _buildBoxList())))
-        /*child: Column(
-                children: [
-                    Row(
-                        children: [
-                          _buildBox(0),
-                          _buildBox(1),
-                          _buildBox(2),
-                        ]
-                    ),
-                    Row(
-                    children: [
-                    _buildBox(3),
-                    _buildBox(4),
-                    _buildBox(5),
-                    ]
-                    ),
-                    Row(
-                    children: [
-                    _buildBox(6),
-                    _buildBox(7),
-                    _buildBox(8),
-                    ]
-                    )
-                  ]
-            ))) */
       ]);
 
   List<Container> _buildBoxList() =>
