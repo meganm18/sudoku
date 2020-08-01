@@ -10,7 +10,7 @@ import 'generator.dart';
 void main() {
   // testing
   //Generator.makeBoard();
-  Generator g = Generator();
+  /*Generator g = Generator();
   g.makeBoard();
   /*List<List<int>> testBoard = [
     [7, 2, null, null, 9, 6, null, null, 3],
@@ -34,7 +34,7 @@ void main() {
     for (var c = 0; c < 9; c++) {
       print("$r, $c: ${g.board[r][c]}");
     }
-  }*/
+  }*/*/
   runApp(MyApp());
 }
 
@@ -131,18 +131,21 @@ class _MyHomePageState extends State<MyHomePage> {
           Spacer(),
             FloatingActionButton(
                 heroTag: null,
+                backgroundColor: Colors.amber,
+                onPressed: _makeBoard,
+                tooltip: 'Increment',
+                child: Text("Make"),
+            ),
+             FloatingActionButton(
+                heroTag: null,
+                backgroundColor: Colors.amber,
                 onPressed: _solveBoard,
                 tooltip: 'Increment',
                 child: Text("Solve"),
             ),
-             FloatingActionButton(
-              heroTag: null,
-              onPressed: _makeBoard,
-              tooltip: 'Increment',
-              child: Text("Make"),
-            ),
           ],
-      )
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       /*floatingActionButton: FloatingActionButton(
         onPressed: _solveBoard,
         tooltip: 'Increment',
