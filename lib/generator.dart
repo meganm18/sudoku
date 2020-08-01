@@ -629,9 +629,9 @@ class Generator {
 
       // Method (1) but for triples
       if (possibleTripleValues.length >= 3) {
-        for (var i = 0; i < (possiblePairValues.length - 2); i++) {
-          for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
-            for (var k = j + 1; k < possiblePairValues.length; k++) {
+        for (var i = 0; i < (possibleTripleValues.length - 2); i++) {
+          for (var j = i + 1; j < (possibleTripleValues.length - 1); j++) {
+            for (var k = j + 1; k < possibleTripleValues.length; k++) {
               // if those 3 squares are the same
               var value1 = possibleTripleValues[i];
               var value2 = possibleTripleValues[j];

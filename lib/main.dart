@@ -182,7 +182,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int row = boxRow * 3 + withinRow;
     int col = boxCol * 3 + withinCol;
-    return _generator.board[row][col].toString();
+    int value = _generator.board[row][col];
+    if(value == null){
+      return " ";
+    }
+    return value.toString();
   }
 
   Widget _buildBox(int ct) => Row(children: [
