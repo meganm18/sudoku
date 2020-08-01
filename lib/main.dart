@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'generator.dart';
 
@@ -125,7 +126,7 @@ class _MyHomePageState extends State<MyHomePage> {
               child: _buildGrid(),
             ),
       ],),),
-         floatingActionButton: Column(
+         floatingActionButton: Row(
         children: <Widget>[
           Spacer(),
             FloatingActionButton(
@@ -157,7 +158,11 @@ class _MyHomePageState extends State<MyHomePage> {
       alignment: Alignment(0, 0),
       child: Container(
           child: TextField(
-              decoration: InputDecoration(hintText: squareNumToValue(num)))));
+              decoration: InputDecoration(hintText: squareNumToValue(num)),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
+
+      )));
 
   /*
     Converts the number the square has (box # and where within the box)
