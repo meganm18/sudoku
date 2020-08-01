@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'generator.dart';
 
@@ -9,7 +10,7 @@ import 'generator.dart';
 void main() {
   // testing
   //Generator.makeBoard();
-  Generator g = Generator();
+  /*Generator g = Generator();
   g.makeBoard();
   /*List<List<int>> testBoard = [
     [7, 2, null, null, 9, 6, null, null, 3],
@@ -33,7 +34,7 @@ void main() {
     for (var c = 0; c < 9; c++) {
       print("$r, $c: ${g.board[r][c]}");
     }
-  }*/
+  }*/*/
   runApp(MyApp());
 }
 
@@ -125,23 +126,26 @@ class _MyHomePageState extends State<MyHomePage> {
               child: _buildGrid(),
             ),
       ],),),
-         floatingActionButton: Column(
+         floatingActionButton: Row(
         children: <Widget>[
           Spacer(),
             FloatingActionButton(
                 heroTag: null,
+                backgroundColor: Colors.amber,
+                onPressed: _makeBoard,
+                tooltip: 'Increment',
+                child: Text("Make"),
+            ),
+             FloatingActionButton(
+                heroTag: null,
+                backgroundColor: Colors.amber,
                 onPressed: _solveBoard,
                 tooltip: 'Increment',
                 child: Text("Solve"),
             ),
-             FloatingActionButton(
-              heroTag: null,
-              onPressed: _makeBoard,
-              tooltip: 'Increment',
-              child: Text("Make"),
-            ),
           ],
-      )
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.endTop,
       /*floatingActionButton: FloatingActionButton(
         onPressed: _solveBoard,
         tooltip: 'Increment',
@@ -157,7 +161,11 @@ class _MyHomePageState extends State<MyHomePage> {
       alignment: Alignment(0, 0),
       child: Container(
           child: TextField(
-              decoration: InputDecoration(hintText: squareNumToValue(num)))));
+              decoration: InputDecoration(hintText: squareNumToValue(num)),
+              keyboardType: TextInputType.number,
+              inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
+
+      )));
 
   /*
     Converts the number the square has (box # and where within the box)
