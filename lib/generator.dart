@@ -12,13 +12,14 @@ import 'dart:math';
 class Generator {
   List<List<int>> board;
   List<List<int>> givenBoard;
+  List<List<int>> solvedBoard;
   Set<int> unknowns;
   Set<int> knowns;
   HashMap<int, HashSet<int>> possible;
 
   Generator() {
     this.board = List.generate(9, (i) => List(9), growable: false);
-    this.givenBoard = List.generate(9, (i) => List(9), growable: false);
+    this.solvedBoard = List.generate(9, (i) => List(9), growable: false);
     this.unknowns = <int>{
       0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18,
       20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38,
@@ -28,7 +29,7 @@ class Generator {
     };
     this.knowns = Set<int>();
     this.possible = HashMap<int, HashSet<int>>();
-
+    this.givenBoard = this.makeBoard();
     /*
     //for testing purposes
     var testBoard = [
@@ -69,8 +70,10 @@ class Generator {
         }
       }
     }
-  this.board = makeClues(this.board);
-  return this.board;
+    this.givenBoard = makeClues(this.board);
+    this.solver();
+    this.solvedBoard = this.board;
+    return this.board;
   }
 
   /*

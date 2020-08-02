@@ -40,6 +40,7 @@ void main() {
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  final textFieldController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -76,11 +77,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Generator _generator = Generator();
+  final _formKey = new GlobalKey<FormState>();
 
   void _solveBoard() {
     setState(() {
       _counter++;
-      _generator.board = _generator.solver();
+      _generator.board = _generator.solvedBoard;
+      _formKey.currentState.reset();
+      _buildGrid();
     });
   }
 
@@ -88,6 +92,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
       _generator.board = _generator.makeBoard();
+      _formKey.currentState.reset();
+      _buildGrid();
     });
   }
 
@@ -123,7 +129,10 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.headline4,
             ),
             Expanded(
-              child: _buildGrid(),
+              child: Form(
+                key: _formKey,
+                child: _buildGrid(),
+              )
             ),
       ],),),
          floatingActionButton: Row(
@@ -154,19 +163,6 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildSquare(int num) => Container(
-      decoration: BoxDecoration(
-        border: Border.all(width: 5, color: Colors.black26),
-      ),
-      alignment: Alignment(0, 0),
-      child: Container(
-          child: TextField(
-              decoration: InputDecoration(hintText: squareNumToValue(num)),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
-
-      )));
-
   /*
     Converts the number the square has (box # and where within the box)
     to the value in the grid (based on key based on row and column overall)
@@ -189,28 +185,55 @@ class _MyHomePageState extends State<MyHomePage> {
     return value.toString();
   }
 
-  Widget _buildBox(int ct) => Row(children: [
-        Flexible(
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 5, color: Colors.black)),
-                child: GridView.count(
-                    crossAxisCount: 3, children: _buildSquareList(ct))))
-      ]);
+  Widget _buildSquare(int num) {
+    Widget child;
+    String value = squareNumToValue(num);
+    if (value == " ") {
+      child = new TextFormField(
+        enabled: true,
+        keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          WhitelistingTextInputFormatter.digitsOnly
+        ],
+      );
+    }
+    else {
+      child = Text(value);
+    }
+    return Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: 5, color: Colors.black26),
+        ),
+        alignment: Alignment(0, 0),
+        child: Container(
+            child: child));
+  }
 
-  List<Container> _buildSquareList(int ct) =>
-      List.generate(9, (i) => Container(child: _buildSquare((ct * 10 + i))));
+    List<Container> _buildSquareList(int ct) =>
+        List.generate(9, (i) => Container(child: _buildSquare((ct * 10 + i))));
 
-  Widget _buildGrid() => Row(children: [
-        Flexible(
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 5, color: Colors.black)),
-                // couldn't figure out how to change input with GridView.count()
-                child: GridView.count(
-                    crossAxisCount: 3, children: _buildBoxList())))
-      ]);
+    Widget _buildBox(int ct) =>
+        Row(children: [
+          Flexible(
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 5, color: Colors.black)),
+                  child: GridView.count(
+                      crossAxisCount: 3, children: _buildSquareList(ct))))
+        ]);
 
-  List<Container> _buildBoxList() =>
-      List.generate(9, (i) => Container(child: _buildBox(i)));
+    List<Container> _buildBoxList() =>
+        List.generate(9, (i) => Container(child: _buildBox(i)));
+
+    Widget _buildGrid() =>
+        Row(children: [
+          Flexible(
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 5, color: Colors.black)),
+                  // couldn't figure out how to change input with GridView.count()
+                  child: GridView.count(
+                      crossAxisCount: 3, children: _buildBoxList())))
+        ]);
+
 }
