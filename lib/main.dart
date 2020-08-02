@@ -190,7 +190,8 @@ class _MyHomePageState extends State<MyHomePage> {
     String value = squareNumToValue(num);
     if (value == " ") {
       child = new TextFormField(
-        enabled: true,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold),
         keyboardType: TextInputType.number,
         inputFormatters: <TextInputFormatter>[
           WhitelistingTextInputFormatter.digitsOnly
@@ -198,8 +199,10 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
     else {
-      child = Text(value);
-    }
+      child = Text(
+          value,
+          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+      );}
     return Container(
         decoration: BoxDecoration(
           border: Border.all(width: 5, color: Colors.black26),
