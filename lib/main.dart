@@ -8,38 +8,12 @@ import 'generator.dart';
 // import 'package:sqflite/sqflite.dart';
 
 void main() {
-  // testing
-  //Generator.makeBoard();
-  /*Generator g = Generator();
-  g.makeBoard();
-  /*List<List<int>> testBoard = [
-    [7, 2, null, null, 9, 6, null, null, 3],
-    [null, null, null, 2, null, 5, null, null, null],
-    [null, 8, null, null, null, 4, null, 2, null],
-    [null, null, null, null, null, null, null, 6, null],
-    [1, null, 6, 5, null, 3, 8, null, 7],
-    [null, 4, null, null, null, null, null, null, null],
-    [null, 3, null, 8, null, null, null, 9, null],
-    [null, null, null, 7, null, 2, null, null, null],
-    [2, null, null, 4, 3, null, null, 1, 8]
-  ];
-  g.board = testBoard;*/
-  for (var r = 0; r < 9; r++) {
-    for (var c = 0; c < 9; c++) {
-      print("$r, $c: ${g.board[r][c]}");
-    }
-  }
-  /*g.solver();
-  for (var r = 0; r < 9; r++) {
-    for (var c = 0; c < 9; c++) {
-      print("$r, $c: ${g.board[r][c]}");
-    }
-  }*/*/
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+  final textFieldController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -76,11 +50,14 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   Generator _generator = Generator();
+  final _formKey = new GlobalKey<FormState>();
 
   void _solveBoard() {
     setState(() {
       _counter++;
-      _generator.board = _generator.solver();
+      _generator.board = _generator.solvedBoard;
+      _formKey.currentState.reset();
+      _buildGrid();
     });
   }
 
@@ -88,6 +65,8 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       _counter++;
       _generator.board = _generator.makeBoard();
+      _formKey.currentState.reset();
+      _buildGrid();
     });
   }
 
@@ -123,7 +102,10 @@ class _MyHomePageState extends State<MyHomePage> {
               style: Theme.of(context).textTheme.headline4,
             ),
             Expanded(
-              child: _buildGrid(),
+              child: Form(
+                key: _formKey,
+                child: _buildGrid(),
+              )
             ),
       ],),),
          floatingActionButton: Row(
@@ -154,22 +136,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildSquare(int num) => Container(
-      decoration: BoxDecoration(
-        border: Border.all(width: 5, color: Colors.black26),
-      ),
-      alignment: Alignment(0, 0),
-      child: Container(
-          child: TextField(
-              decoration: InputDecoration(hintText: squareNumToValue(num)),
-              keyboardType: TextInputType.number,
-              inputFormatters: <TextInputFormatter>[WhitelistingTextInputFormatter.digitsOnly],
-
-      )));
-
   /*
     Converts the number the square has (box # and where within the box)
-    to the value in the grid (based on key based on row and column overall)
+    to the starting value in the grid (based on key based on row and column overall)
    */
   String squareNumToValue(int num) {
     int box = num ~/ 10;
@@ -182,31 +151,102 @@ class _MyHomePageState extends State<MyHomePage> {
 
     int row = boxRow * 3 + withinRow;
     int col = boxCol * 3 + withinCol;
-    return _generator.board[row][col].toString();
+    int value = _generator.board[row][col];
+    if(value == null){
+      return " ";
+    }
+    return value.toString();
   }
 
-  Widget _buildBox(int ct) => Row(children: [
-        Flexible(
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 5, color: Colors.black)),
-                child: GridView.count(
-                    crossAxisCount: 3, children: _buildSquareList(ct))))
-      ]);
+  /*
+    Returns whether the square is a given clue (true) or not (false)
+    Used for differentiating color when displaying a board after the user
+    presses Solve
+   */
+  bool isSquareGiven(int num) {
+    int box = num ~/ 10;
+    int boxRow = box ~/ 3;
+    int boxCol = box % 3;
 
-  List<Container> _buildSquareList(int ct) =>
-      List.generate(9, (i) => Container(child: _buildSquare((ct * 10 + i))));
+    int within = num % 10;
+    int withinRow = within ~/ 3;
+    int withinCol = within % 3;
 
-  Widget _buildGrid() => Row(children: [
-        Flexible(
-            child: Container(
-                decoration: BoxDecoration(
-                    border: Border.all(width: 5, color: Colors.black)),
-                // couldn't figure out how to change input with GridView.count()
-                child: GridView.count(
-                    crossAxisCount: 3, children: _buildBoxList())))
-      ]);
+    int row = boxRow * 3 + withinRow;
+    int col = boxCol * 3 + withinCol;
+    int value = _generator.givenBoard[row][col];
+    if(value == null){
+      return false;
+    }
+    return true;
+  }
 
-  List<Container> _buildBoxList() =>
-      List.generate(9, (i) => Container(child: _buildBox(i)));
+  Widget _buildSquare(int num) {
+    Widget child;
+    String value = squareNumToValue(num);
+    if (value == " ") {
+      child = new TextFormField(
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold),
+        keyboardType: TextInputType.number,
+        inputFormatters: <TextInputFormatter>[
+          WhitelistingTextInputFormatter.digitsOnly
+        ],
+      );
+    }
+    else {
+      if(isSquareGiven(num)){
+        child = Text(
+          value,
+          style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
+        );}
+
+      else {
+        child = new TextFormField(
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+          decoration: InputDecoration(hintText: value,),
+          keyboardType: TextInputType.number,
+          inputFormatters: <TextInputFormatter>[
+            WhitelistingTextInputFormatter.digitsOnly
+          ],
+        );
+      }
+    }
+    return Container(
+        decoration: BoxDecoration(
+          border: Border.all(width: 5, color: Colors.black26),
+        ),
+        alignment: Alignment(0, 0),
+        child: Container(
+            child: child));
+  }
+
+    List<Container> _buildSquareList(int ct) =>
+        List.generate(9, (i) => Container(child: _buildSquare((ct * 10 + i))));
+
+    Widget _buildBox(int ct) =>
+        Row(children: [
+          Flexible(
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 5, color: Colors.black)),
+                  child: GridView.count(
+                      crossAxisCount: 3, children: _buildSquareList(ct))))
+        ]);
+
+    List<Container> _buildBoxList() =>
+        List.generate(9, (i) => Container(child: _buildBox(i)));
+
+    Widget _buildGrid() =>
+        Row(children: [
+          Flexible(
+              child: Container(
+                  decoration: BoxDecoration(
+                      border: Border.all(width: 5, color: Colors.black)),
+                  // couldn't figure out how to change input with GridView.count()
+                  child: GridView.count(
+                      crossAxisCount: 3, children: _buildBoxList())))
+        ]);
+
 }

@@ -12,13 +12,14 @@ import 'dart:math';
 class Generator {
   List<List<int>> board;
   List<List<int>> givenBoard;
+  List<List<int>> solvedBoard;
   Set<int> unknowns;
   Set<int> knowns;
   HashMap<int, HashSet<int>> possible;
 
   Generator() {
     this.board = List.generate(9, (i) => List(9), growable: false);
-    this.givenBoard = List.generate(9, (i) => List(9), growable: false);
+    this.solvedBoard = List.generate(9, (i) => List(9), growable: false);
     this.unknowns = <int>{
       0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18,
       20, 21, 22, 23, 24, 25, 26, 27, 28, 30, 31, 32, 33, 34, 35, 36, 37, 38,
@@ -28,7 +29,7 @@ class Generator {
     };
     this.knowns = Set<int>();
     this.possible = HashMap<int, HashSet<int>>();
-
+    this.givenBoard = this.makeBoard();
     /*
     //for testing purposes
     var testBoard = [
@@ -54,9 +55,17 @@ class Generator {
     while (i < 10000) {
       i++;
       this.reset();
-      var returnedBoard = this.makeSolvedBoard(
+      this.board = this.makeSolvedBoard(
           this.board, this.unknowns, this.knowns, this.possible);
-      if (returnedBoard[0][0] == null) {
+
+      // need to make a deep copy between this.board and this.solvedBoard
+      for(int r = 0; r < 9; r++){
+        for(int c = 0; c < 9; c++){
+          this.solvedBoard[r][c] = this.board[r][c];
+        }
+      }
+
+      if (solvedBoard[0][0] == null) {
         print("Error");
       }
       else {
@@ -69,8 +78,9 @@ class Generator {
         }
       }
     }
-  this.board = makeClues(this.board);
-  return this.board;
+
+    this.givenBoard = makeClues(this.board);
+    return this.board;
   }
 
   /*
@@ -100,10 +110,9 @@ class Generator {
       unknowns.forEach((square) {
         this.board[square ~/ 10][square % 10] = null;
       });
-
       this.board[row][col] = null;
-      var solvedBoard = this.solver();
-      if(solvedBoard[0][0] == null){
+      var solverBoard = this.solver();
+      if(solverBoard[0][0] == null){
         cantSolveCt++;
         this.board[row][col] = value;
         board[row][col] = value;
@@ -148,9 +157,9 @@ class Generator {
         // see if solvable (minimum number of clues for it to be solvable is 17)
         if(knowns.length >= 17){
           this.board = board;
-          var solvedBoard = this.solver();
-          if (solvedBoard[0][0] != null){
-            return solvedBoard;
+          var solverBoard = this.solver();
+          if (solverBoard[0][0] != null){
+            return solverBoard;
           }
         }
         var copyBoard = board;
@@ -629,9 +638,9 @@ class Generator {
 
       // Method (1) but for triples
       if (possibleTripleValues.length >= 3) {
-        for (var i = 0; i < (possiblePairValues.length - 2); i++) {
-          for (var j = i + 1; j < (possiblePairValues.length - 1); j++) {
-            for (var k = j + 1; k < possiblePairValues.length; k++) {
+        for (var i = 0; i < (possibleTripleValues.length - 2); i++) {
+          for (var j = i + 1; j < (possibleTripleValues.length - 1); j++) {
+            for (var k = j + 1; k < possibleTripleValues.length; k++) {
               // if those 3 squares are the same
               var value1 = possibleTripleValues[i];
               var value2 = possibleTripleValues[j];
