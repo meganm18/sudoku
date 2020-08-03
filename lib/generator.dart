@@ -1122,57 +1122,26 @@ class Generator {
     @return       true if duplicate, false otherwise
    */
   bool isError() {
-    // row
-    for (var r = 0; r < 9; r++) {
-      var rowSet = HashSet<int>();
-      for (var c = 0; c < 9; c++) {
-        var boardValue = this.board[r][c];
-        if (boardValue != null) {
-          if (rowSet.contains(boardValue)) {
+    var row = List.generate(9, (i) => List.generate(9, (j) => true), growable: false);
+    var col = List.generate(9, (i) => List.generate(9, (j) => true), growable: false);
+    var box = List.generate(9, (i) => List.generate(9, (j) => true), growable: false);
+
+    for(var r = 0; r < 9; r++){
+      for(var c = 0; c < 9; c++) {
+        int val = this.board[r][c];
+        if (val != null) {
+          int boxr = r ~/ 3;
+          int boxc = c ~/ 3;
+          int boxnum = boxr * 3 + boxc;
+          if (row[r][val] || col[c][val] || box[boxnum][val]) {
             return true;
-          } else {
-            rowSet.add(boardValue);
           }
-        } // if not null
-      } // for col
-    } // for row
-
-    // column
-    for (var c = 0; c < 9; c++) {
-      var columnSet = HashSet<int>();
-      for (var r = 0; r < 9; r++) {
-        var boardValue = this.board[r][c];
-        if (boardValue != null) {
-          if (columnSet.contains(boardValue)) {
-            return true;
-          } else {
-            columnSet.add(boardValue);
-          }
-        } // if not null
-      } // for row
-    } // for col
-
-    // square of 9
-    for (var rindex = 0; rindex < 3; rindex++) {
-      for (var cindex = 0; cindex < 3; cindex++) {
-        var groupSet = HashSet<int>();
-        for (var r = 0; r < 3; r++) {
-          for (var c = 0; c < 3; c++) {
-            var row = rindex * 3 + r;
-            var column = cindex * 3 + c;
-            var boardValue = this.board[row][column];
-            if (boardValue != null) {
-              if (groupSet.contains(boardValue)) {
-                return true;
-              } else {
-                groupSet.add(boardValue);
-              }
-            } // if not null
-          } // for c
-        } // for r
-      } // for cindex
-    } // for rindex
-
+          row[r][val] = true;
+          col[c][val] = true;
+          box[boxnum][val] = true;
+        }
+      }
+    }
     return false;
   } // isError()
 
