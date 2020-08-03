@@ -8,33 +8,6 @@ import 'generator.dart';
 // import 'package:sqflite/sqflite.dart';
 
 void main() {
-  // testing
-  //Generator.makeBoard();
-  /*Generator g = Generator();
-  g.makeBoard();
-  /*List<List<int>> testBoard = [
-    [7, 2, null, null, 9, 6, null, null, 3],
-    [null, null, null, 2, null, 5, null, null, null],
-    [null, 8, null, null, null, 4, null, 2, null],
-    [null, null, null, null, null, null, null, 6, null],
-    [1, null, 6, 5, null, 3, 8, null, 7],
-    [null, 4, null, null, null, null, null, null, null],
-    [null, 3, null, 8, null, null, null, 9, null],
-    [null, null, null, 7, null, 2, null, null, null],
-    [2, null, null, 4, 3, null, null, 1, 8]
-  ];
-  g.board = testBoard;*/
-  for (var r = 0; r < 9; r++) {
-    for (var c = 0; c < 9; c++) {
-      print("$r, $c: ${g.board[r][c]}");
-    }
-  }
-  /*g.solver();
-  for (var r = 0; r < 9; r++) {
-    for (var c = 0; c < 9; c++) {
-      print("$r, $c: ${g.board[r][c]}");
-    }
-  }*/*/
   runApp(MyApp());
 }
 
@@ -165,7 +138,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /*
     Converts the number the square has (box # and where within the box)
-    to the value in the grid (based on key based on row and column overall)
+    to the starting value in the grid (based on key based on row and column overall)
    */
   String squareNumToValue(int num) {
     int box = num ~/ 10;
@@ -185,6 +158,29 @@ class _MyHomePageState extends State<MyHomePage> {
     return value.toString();
   }
 
+  /*
+    Returns whether the square is a given clue (true) or not (false)
+    Used for differentiating color when displaying a board after the user
+    presses Solve
+   */
+  bool isSquareGiven(int num) {
+    int box = num ~/ 10;
+    int boxRow = box ~/ 3;
+    int boxCol = box % 3;
+
+    int within = num % 10;
+    int withinRow = within ~/ 3;
+    int withinCol = within % 3;
+
+    int row = boxRow * 3 + withinRow;
+    int col = boxCol * 3 + withinCol;
+    int value = _generator.givenBoard[row][col];
+    if(value == null){
+      return false;
+    }
+    return true;
+  }
+
   Widget _buildSquare(int num) {
     Widget child;
     String value = squareNumToValue(num);
@@ -199,10 +195,24 @@ class _MyHomePageState extends State<MyHomePage> {
       );
     }
     else {
-      child = Text(
+      if(isSquareGiven(num)){
+        child = Text(
           value,
           style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-      );}
+        );}
+
+      else {
+        child = new TextFormField(
+          textAlign: TextAlign.center,
+          style: TextStyle(fontWeight: FontWeight.bold),
+          decoration: InputDecoration(hintText: value,),
+          keyboardType: TextInputType.number,
+          inputFormatters: <TextInputFormatter>[
+            WhitelistingTextInputFormatter.digitsOnly
+          ],
+        );
+      }
+    }
     return Container(
         decoration: BoxDecoration(
           border: Border.all(width: 5, color: Colors.black26),

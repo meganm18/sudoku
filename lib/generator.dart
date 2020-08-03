@@ -55,9 +55,17 @@ class Generator {
     while (i < 10000) {
       i++;
       this.reset();
-      var returnedBoard = this.makeSolvedBoard(
+      this.board = this.makeSolvedBoard(
           this.board, this.unknowns, this.knowns, this.possible);
-      if (returnedBoard[0][0] == null) {
+
+      // need to make a deep copy between this.board and this.solvedBoard
+      for(int r = 0; r < 9; r++){
+        for(int c = 0; c < 9; c++){
+          this.solvedBoard[r][c] = this.board[r][c];
+        }
+      }
+
+      if (solvedBoard[0][0] == null) {
         print("Error");
       }
       else {
@@ -70,9 +78,8 @@ class Generator {
         }
       }
     }
+
     this.givenBoard = makeClues(this.board);
-    this.solver();
-    this.solvedBoard = this.board;
     return this.board;
   }
 
@@ -103,10 +110,9 @@ class Generator {
       unknowns.forEach((square) {
         this.board[square ~/ 10][square % 10] = null;
       });
-
       this.board[row][col] = null;
-      var solvedBoard = this.solver();
-      if(solvedBoard[0][0] == null){
+      var solverBoard = this.solver();
+      if(solverBoard[0][0] == null){
         cantSolveCt++;
         this.board[row][col] = value;
         board[row][col] = value;
@@ -151,9 +157,9 @@ class Generator {
         // see if solvable (minimum number of clues for it to be solvable is 17)
         if(knowns.length >= 17){
           this.board = board;
-          var solvedBoard = this.solver();
-          if (solvedBoard[0][0] != null){
-            return solvedBoard;
+          var solverBoard = this.solver();
+          if (solverBoard[0][0] != null){
+            return solverBoard;
           }
         }
         var copyBoard = board;
