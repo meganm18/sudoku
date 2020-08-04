@@ -187,6 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
     if (value == " ") {
       child = new TextFormField(
         textAlign: TextAlign.center,
+        textAlignVertical: TextAlignVertical.center,
         style: TextStyle(fontWeight: FontWeight.bold),
         keyboardType: TextInputType.number,
         inputFormatters: <TextInputFormatter>[
@@ -204,6 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
       else {
         child = new TextFormField(
           textAlign: TextAlign.center,
+          textAlignVertical: TextAlignVertical.center,
           style: TextStyle(fontWeight: FontWeight.bold),
           decoration: InputDecoration(hintText: value,),
           keyboardType: TextInputType.number,
