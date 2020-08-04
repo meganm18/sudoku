@@ -662,15 +662,22 @@ class Generator {
             // then they are a pair
             if (rowValueCounts[i][value1].intersection
                 (rowValueCounts[i][value2]).length == 2){
-                returnValue = true;
+                // if this does change the possible values, mark it as so
+               // otherwise change the possible values
+                var square0 = rowValueCounts[i][value1].toList()[0];
+                var square1 = rowValueCounts[i][value1].toList()[1];
+                if(this.possible[square0].length != 2 ||
+                    this.possible[square1].length != 2) {
+                  returnValue = true;
 
-                // update so these 2 squares have no other possibilities but
-                // these 2 values
-                rowValueCounts[i][value1].forEach((element) {
-                  this.possible[element].clear();
-                  this.possible[element].add(value1);
-                  this.possible[element].add(value2);
-                });
+                  // update so these 2 squares have no other possibilities but
+                  // these 2 values
+                  rowValueCounts[i][value1].forEach((element) {
+                    this.possible[element].clear();
+                    this.possible[element].add(value1);
+                    this.possible[element].add(value2);
+                  });
+                }
             } // end if intersection is 2
           } // end for k
         } // end for j
@@ -690,16 +697,23 @@ class Generator {
               if (rowValueCounts[i][value1].intersection(
                 rowValueCounts[i][value2]).intersection(
                 rowValueCounts[i][value3]).length == 3) {
-                returnValue = true;
+                var square0 = rowValueCounts[i][value1].toList()[0];
+                var square1 = rowValueCounts[i][value1].toList()[1];
+                var square2 = rowValueCounts[i][value1].toList()[2];
+                if(this.possible[square0].length > 3 ||
+                    this.possible[square1].length > 3 ||
+                    this.possible[square2].length > 3) {
+                  returnValue = true;
 
-                // update so these 3 squares have no other possibilities than
-                // these 3 values
-                rowValueCounts[i][value1].forEach((element) {
-                  this.possible[element].clear();
-                  this.possible[element].add(value1);
-                  this.possible[element].add(value2);
-                  this.possible[element].add(value3);
-                });
+                  // update so these 3 squares have no other possibilities than
+                  // these 3 values
+                  rowValueCounts[i][value1].forEach((element) {
+                    this.possible[element].clear();
+                    this.possible[element].add(value1);
+                    this.possible[element].add(value2);
+                    this.possible[element].add(value3);
+                  });
+                }
               } // end if intersection is 3
             } // for l
           } // for k
@@ -718,15 +732,20 @@ class Generator {
             // then they are a pair
             if (columnValueCounts[i][value1].intersection
               (columnValueCounts[i][value2]).length == 2){
-              returnValue = true;
+              var square0 = columnValueCounts[i][value1].toList()[0];
+              var square1 = columnValueCounts[i][value2].toList()[1];
+              if(this.possible[square0].length > 2 ||
+                this.possible[square1].length > 2) {
+                returnValue = true;
 
-              // update so these 2 squares have no other possibilities but
-              // these 2 values
-              columnValueCounts[i][value1].forEach((element) {
-                this.possible[element].clear();
-                this.possible[element].add(value1);
-                this.possible[element].add(value2);
-              });
+                // update so these 2 squares have no other possibilities but
+                // these 2 values
+                columnValueCounts[i][value1].forEach((element) {
+                  this.possible[element].clear();
+                  this.possible[element].add(value1);
+                  this.possible[element].add(value2);
+                });
+              }
             } // end if intersection is 2
           } // end for k
         } // end for j
@@ -746,16 +765,23 @@ class Generator {
               if (columnValueCounts[i][value1].intersection(
                   columnValueCounts[i][value2]).intersection(
                   columnValueCounts[i][value3]).length == 3) {
-                returnValue = true;
+                var square0 = columnValueCounts[i][value1].toList()[0];
+                var square1 = columnValueCounts[i][value1].toList()[1];
+                var square2 = columnValueCounts[i][value1].toList()[2];
+                if(this.possible[square0].length > 3 ||
+                    this.possible[square1].length > 3 ||
+                    this.possible[square2].length > 3) {
+                  returnValue = true;
 
-                // update so these 3 squares have no other possibilities than
-                // these 3 values
-                columnValueCounts[i][value1].forEach((element) {
-                  this.possible[element].clear();
-                  this.possible[element].add(value1);
-                  this.possible[element].add(value2);
-                  this.possible[element].add(value3);
-                });
+                  // update so these 3 squares have no other possibilities than
+                  // these 3 values
+                  columnValueCounts[i][value1].forEach((element) {
+                    this.possible[element].clear();
+                    this.possible[element].add(value1);
+                    this.possible[element].add(value2);
+                    this.possible[element].add(value3);
+                  });
+                }
               } // end if intersection is 3
             } // for l
           } // for k
@@ -774,15 +800,20 @@ class Generator {
             // then they are a pair
             if (boxValueCounts[i][value1].intersection
               (boxValueCounts[i][value2]).length == 2){
-              returnValue = true;
+              var square0 = boxValueCounts[i][value1].toList()[0];
+              var square1 = boxValueCounts[i][value1].toList()[1];
+              if(this.possible[square0].length > 2 ||
+                  this.possible[square1].length > 2) {
+                returnValue = true;
 
-              // update so these 2 squares have no other possibilities but
-              // these 2 values
-              boxValueCounts[i][value1].forEach((element) {
-                this.possible[element].clear();
-                this.possible[element].add(value1);
-                this.possible[element].add(value2);
-              });
+                // update so these 2 squares have no other possibilities but
+                // these 2 values
+                boxValueCounts[i][value1].forEach((element) {
+                  this.possible[element].clear();
+                  this.possible[element].add(value1);
+                  this.possible[element].add(value2);
+                });
+              }
             } // end if intersection is 2
           } // end for k
         } // end for j
@@ -802,16 +833,23 @@ class Generator {
               if (boxValueCounts[i][value1].intersection(
                   boxValueCounts[i][value2]).intersection(
                   boxValueCounts[i][value3]).length == 3) {
-                returnValue = true;
+                var square0 = boxValueCounts[i][value1].toList()[0];
+                var square1 = boxValueCounts[i][value1].toList()[1];
+                var square2 = boxValueCounts[i][value1].toList()[2];
+                if(this.possible[square0].length > 3 ||
+                    this.possible[square1].length > 3 ||
+                    this.possible[square2].length > 3) {
+                  returnValue = true;
 
-                // update so these 3 squares have no other possibilities than
-                // these 3 values
-                boxValueCounts[i][value1].forEach((element) {
-                  this.possible[element].clear();
-                  this.possible[element].add(value1);
-                  this.possible[element].add(value2);
-                  this.possible[element].add(value3);
-                });
+                  // update so these 3 squares have no other possibilities than
+                  // these 3 values
+                  boxValueCounts[i][value1].forEach((element) {
+                    this.possible[element].clear();
+                    this.possible[element].add(value1);
+                    this.possible[element].add(value2);
+                    this.possible[element].add(value3);
+                  });
+                }
               } // end if intersection is 3
             } // for l
           } // for k
@@ -830,16 +868,18 @@ class Generator {
 
             // check intersection is see if this is a pair
             if(this.possible[key1].intersection(this.possible[key2]).length == 2){
-              returnValue = true;
-
               // The rest of the squares should not have these as possible values
               var firstValue = this.possible[key1].toList()[0];
               var secondValue = this.possible[key2].toList()[1];
               for(var col2 = 0; col2 < 9; col2++){
                 var key3 = i * 10 + col2;
                 if(key3 != key1 && key3 != key2 && this.unknowns.contains(key3)){
-                  this.possible[key3].remove(firstValue);
-                  this.possible[key3].remove(secondValue);
+                  if(this.possible[key3].contains(firstValue) ||
+                      this.possible[key3].contains(secondValue)) {
+                    returnValue = true;
+                    this.possible[key3].remove(firstValue);
+                    this.possible[key3].remove(secondValue);
+                  }
                 }
               }
             } // if intersection length is 2
@@ -861,8 +901,6 @@ class Generator {
               if(this.possible[key1].intersection(
                 this.possible[key2]).intersection(
                 this.possible[key3]).length == 3) {
-                returnValue = true;
-
                 // the rest of the squares should not have these values as possible
                 var firstValue = this.possible[key1].toList()[0];
                 var secondValue = this.possible[key1].toList()[1];
@@ -871,9 +909,14 @@ class Generator {
                   var key4 = i * 10 + col2;
                   if(key4 != key1 && key4 != key2 && key4 != key3 &&
                       this.unknowns.contains(key4)){
-                    this.possible[key4].remove(firstValue);
-                    this.possible[key4].remove(secondValue);
-                    this.possible[key4].remove(thirdValue);
+                    if(this.possible[key4].contains(firstValue) ||
+                        this.possible[key4].contains(secondValue) ||
+                        this.possible[key4].contains(thirdValue)) {
+                      returnValue = true;
+                      this.possible[key4].remove(firstValue);
+                      this.possible[key4].remove(secondValue);
+                      this.possible[key4].remove(thirdValue);
+                    }
                   }
                 } // for each column
               } // if intersection length is 3
@@ -893,16 +936,18 @@ class Generator {
 
             // check intersection is see if this is a pair
             if(this.possible[key1].intersection(this.possible[key2]).length == 2){
-              returnValue = true;
-
               // The rest of the squares should not have these as possible values
               var firstValue = this.possible[key1].toList()[0];
               var secondValue = this.possible[key2].toList()[1];
               for(var row2 = 0; row2 < 9; row2++){
                 var key3 = row2 * 10 + i;
                 if(key3 != key1 && key3 != key2 && this.unknowns.contains(key3)){
-                  this.possible[key3].remove(firstValue);
-                  this.possible[key3].remove(secondValue);
+                  if(this.possible[key3].contains(firstValue) ||
+                      this.possible[key3].contains(secondValue)) {
+                    returnValue = true;
+                    this.possible[key3].remove(firstValue);
+                    this.possible[key3].remove(secondValue);
+                  }
                 }
               }
             } // if intersection length is 2
@@ -924,8 +969,6 @@ class Generator {
               if(this.possible[key1].intersection(
                   this.possible[key2]).intersection(
                   this.possible[key3]).length == 3) {
-                returnValue = true;
-
                 // the rest of the squares should not have these values as possible
                 var firstValue = this.possible[key1].toList()[0];
                 var secondValue = this.possible[key1].toList()[1];
@@ -934,9 +977,14 @@ class Generator {
                   var key4 = row2 * 10 + i;
                   if(key4 != key1 && key4 != key2 && key4 != key3 &&
                       this.unknowns.contains(key4)){
-                    this.possible[key4].remove(firstValue);
-                    this.possible[key4].remove(secondValue);
-                    this.possible[key4].remove(thirdValue);
+                    if(this.possible[key4].contains(firstValue) ||
+                        this.possible[key4].contains(secondValue) ||
+                        this.possible[key4].contains(thirdValue)) {
+                      returnValue = true;
+                      this.possible[key4].remove(firstValue);
+                      this.possible[key4].remove(secondValue);
+                      this.possible[key4].remove(thirdValue);
+                    }
                   }
                 } // for each column
               } // if intersection length is 3
@@ -956,8 +1004,6 @@ class Generator {
 
             // check intersection is see if this is a pair
             if(this.possible[key1].intersection(this.possible[key2]).length == 2){
-              returnValue = true;
-
               // The rest of the squares should not have these as possible values
               var firstValue = this.possible[key1].toList()[0];
               var secondValue = this.possible[key2].toList()[1];
@@ -969,8 +1015,12 @@ class Generator {
                   var col = boxCol * 3 + col2;
                   var key3 = row * 10 + col;
                   if(key3 != key1 && key3 != key2 && this.unknowns.contains(key3)) {
-                    this.possible[key3].remove(firstValue);
-                    this.possible[key3].remove(secondValue);
+                    if(this.possible[key3].contains(firstValue) ||
+                        this.possible[key3].contains(secondValue)) {
+                      returnValue = true;
+                      this.possible[key3].remove(firstValue);
+                      this.possible[key3].remove(secondValue);
+                    }
                   }
                 } // for col2
               } // for row2
@@ -993,8 +1043,6 @@ class Generator {
               if(this.possible[key1].intersection(
                   this.possible[key2]).intersection(
                   this.possible[key3]).length == 3) {
-                returnValue = true;
-
                 // the rest of the squares should not have these values as possible
                 var firstValue = this.possible[key1].toList()[0];
                 var secondValue = this.possible[key1].toList()[1];
@@ -1008,9 +1056,14 @@ class Generator {
                     var key4 = row * 10 + col;
                     if(key4 != key1 && key4 != key2 && key4 != key3 &&
                     this.unknowns.contains(key4)){
-                      this.possible[key4].remove(firstValue);
-                      this.possible[key4].remove(secondValue);
-                      this.possible[key4].remove(thirdValue);
+                      if(this.possible[key4].contains(firstValue) ||
+                          this.possible[key4].contains(secondValue) ||
+                          this.possible[key4].contains(thirdValue)) {
+                        returnValue = true;
+                        this.possible[key4].remove(firstValue);
+                        this.possible[key4].remove(secondValue);
+                        this.possible[key4].remove(thirdValue);
+                      }
                     }
                   } // for each column
                 } // for each row
